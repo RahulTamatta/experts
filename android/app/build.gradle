@@ -1,0 +1,104 @@
+buildscript {
+    dependencies {
+        classpath("com.android.tools:r8:8.2.47")
+    }
+}
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
+}
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader('UTF-8') { reader ->
+        localProperties.load(reader)
+    }
+}
+
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '19'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '2.2.1'
+}
+
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+   keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    compileSdkVersion 34
+   packagingOptions {
+        pickFirst 'lib/**/libaosl.so'
+    }
+kotlinOptions {
+    jvmTarget = JavaVersion.VERSION_17.toString()
+  }
+    compileOptions {
+       sourceCompatibility = JavaVersion.VERSION_17
+       targetCompatibility = JavaVersion.VERSION_17
+        coreLibraryDesugaringEnabled true
+
+    }
+    ndkVersion "27.0.12077973"
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+        checkReleaseBuilds false 
+    }
+    defaultConfig {
+        applicationId "com.astrowaydiploy.user"
+        minSdkVersion 23
+        targetSdkVersion flutter.targetSdkVersion
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+        ndk {
+           abiFilters "armeabi-v7a","arm64-v8a"
+           //,"x86","x86_64"
+      }
+    }
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
+
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), ' proguard-rules.pro'
+        }
+    }
+    namespace 'com.astrowaydiploy.user'
+}
+flutter {
+    source '../..'
+}
+dependencies {
+    api 'io.agora.infra:aosl:1.2.13'
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation 'com.google.code.gson:gson:2.8.9' // Add this line
+    implementation 'com.google.firebase:firebase-auth'
+    implementation ('com.android.support:multidex:2.0.1') {
+        exclude module: "play-services-safetynet"
+    }
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
+
+
+}

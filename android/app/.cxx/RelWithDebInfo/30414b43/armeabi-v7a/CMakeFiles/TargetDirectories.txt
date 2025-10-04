@@ -1,0 +1,2 @@
+/Users/karanbisht/Documents/GitHub/Astroway-customer-app-new/android/app/.cxx/RelWithDebInfo/30414b43/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/karanbisht/Documents/GitHub/Astroway-customer-app-new/android/app/.cxx/RelWithDebInfo/30414b43/armeabi-v7a/CMakeFiles/rebuild_cache.dir

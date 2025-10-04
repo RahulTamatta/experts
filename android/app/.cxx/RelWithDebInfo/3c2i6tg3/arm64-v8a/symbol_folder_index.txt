@@ -1,0 +1,1 @@
+/Users/sunilsingh/Desktop/diploy workspace/Astroway-customer-app-new/build/app/intermediates/cxx/RelWithDebInfo/3c2i6tg3/obj/arm64-v8a
