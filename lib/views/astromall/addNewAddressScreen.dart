@@ -42,17 +42,19 @@ class AddNewAddressScreen extends StatelessWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child:SizedBox(
+                  child: SizedBox(
                     child: Theme(
                       data: ThemeData(
-                        dialogTheme: DialogTheme(
-                          contentTextStyle: const TextStyle(color: Colors.white),
+                        dialogTheme: DialogThemeData(
+                          contentTextStyle:
+                              const TextStyle(color: Colors.white),
                           backgroundColor: Colors.grey[800],
                           surfaceTintColor: Colors.grey[800],
                         ),
                       ),
                       child: InternationalPhoneNumberInput(
-                        textFieldController: astromallController.phoneController,
+                        textFieldController:
+                            astromallController.phoneController,
                         inputDecoration: const InputDecoration(
                             border: InputBorder.none,
                             hintText: 'Phone number',
@@ -74,26 +76,24 @@ class AddNewAddressScreen extends StatelessWidget {
                         selectorTextStyle: const TextStyle(color: Colors.black),
                         searchBoxDecoration: InputDecoration(
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(2.w)),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(2.w)),
                               borderSide: const BorderSide(color: Colors.white),
                             ),
                             hintText: "Search",
                             hintStyle: const TextStyle(
                               color: Colors.black,
                             )),
-                        initialValue:PhoneNumber(isoCode:  'IN') ,
+                        initialValue: PhoneNumber(isoCode: 'IN'),
                         formatInput: false,
                         keyboardType: const TextInputType.numberWithOptions(
                             signed: true, decimal: false),
                         inputBorder: InputBorder.none,
-                        onSaved: (PhoneNumber number) {
-                        },
+                        onSaved: (PhoneNumber number) {},
                         onFieldSubmitted: (value) {
                           FocusScope.of(context).unfocus();
                         },
-                        onInputChanged: (PhoneNumber number) {
-
-                        },
+                        onInputChanged: (PhoneNumber number) {},
                         onSubmit: () {
                           FocusScope.of(context).unfocus();
                         },
@@ -130,12 +130,12 @@ class AddNewAddressScreen extends StatelessWidget {
                   //   },
                   // )),
                 ),
-
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child:SizedBox(
+                  child: SizedBox(
                     child: InternationalPhoneNumberInput(
-                      textFieldController: astromallController.alternatePhoneController,
+                      textFieldController:
+                          astromallController.alternatePhoneController,
                       inputDecoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: 'Phone number',
@@ -157,26 +157,25 @@ class AddNewAddressScreen extends StatelessWidget {
                       selectorTextStyle: const TextStyle(color: Colors.black),
                       searchBoxDecoration: InputDecoration(
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(2.w)),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(2.w)),
                             borderSide: const BorderSide(color: Colors.white),
                           ),
                           hintText: "Search",
                           hintStyle: const TextStyle(
                             color: Colors.black,
                           )),
-                      initialValue:PhoneNumber(isoCode: astromallController.countryCode2 ?? 'IN') ,
+                      initialValue: PhoneNumber(
+                          isoCode: astromallController.countryCode2 ?? 'IN'),
                       formatInput: false,
                       keyboardType: const TextInputType.numberWithOptions(
                           signed: true, decimal: false),
                       inputBorder: InputBorder.none,
-                      onSaved: (PhoneNumber number) {
-                      },
+                      onSaved: (PhoneNumber number) {},
                       onFieldSubmitted: (value) {
                         FocusScope.of(context).unfocus();
                       },
-                      onInputChanged: (PhoneNumber number) {
-
-                      },
+                      onInputChanged: (PhoneNumber number) {},
                       onSubmit: () {
                         FocusScope.of(context).unfocus();
                       },
