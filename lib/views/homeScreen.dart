@@ -49,7 +49,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:skeletonizer/skeletonizer.dart';
+// import 'package:skeletonizer/skeletonizer.dart'; // Removed due to Canvas API incompatibility
 import '../controllers/IntakeController.dart';
 import '../controllers/chatController.dart';
 import '../controllers/settings_controller.dart';
@@ -61,6 +61,36 @@ import '../widget/videoPlayerWidget.dart';
 import 'CustomText.dart';
 import 'astromall/astroProductScreen.dart';
 import 'daily_horoscope/dailyHoroscopeScreen.dart';
+
+// Simple Skeletonizer replacement widget
+class Skeletonizer extends StatelessWidget {
+  final Widget child;
+  final bool enabled;
+  final Color? containersColor;
+
+  const Skeletonizer({
+    Key? key,
+    required this.child,
+    this.enabled = false,
+    this.containersColor,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    if (!enabled) return child;
+    
+    return Container(
+      decoration: BoxDecoration(
+        color: containersColor ?? Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Opacity(
+        opacity: 0.7,
+        child: child,
+      ),
+    );
+  }
+}
 
 class HomeScreen extends StatefulWidget {
   final KundliModel? userDetails;

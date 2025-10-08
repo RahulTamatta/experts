@@ -17,7 +17,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.hiennv.flutter_callkit_incoming.CallkitConstants
-import com.otpless.otplessflutter.OtplessFlutterPlugin
+// OTPless removed - using Firebase Auth instead
 class MainActivity: FlutterActivity() {
     private val CHANNEL_NAME = "com.astrowaydiploy.user/channel_test"
 
@@ -108,20 +108,8 @@ class MainActivity: FlutterActivity() {
         }
         return completed
     }
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        val plugin = flutterEngine?.plugins?.get(OtplessFlutterPlugin::class.java)
-        if (plugin is OtplessFlutterPlugin) {
-            plugin.onNewIntent(intent)
-        }
-    }
-    override fun onBackPressed() {
-        val plugin = flutterEngine?.plugins?.get(OtplessFlutterPlugin::class.java)
-        if (plugin is OtplessFlutterPlugin) {
-            if (plugin.onBackPressed()) return
-        }
-        super.onBackPressed()
-    }
+    // OTPless methods removed - using Firebase Auth instead
+    // override fun onNewIntent and onBackPressed removed as OTPless is no longer used
 
 }
 

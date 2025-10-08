@@ -59,49 +59,49 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: Get.height * 0.22,
                         child: Center(
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  child: Align(
-                                    alignment: Alignment.topRight,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Get.find<SearchControllerCustom>()
-                                            .serachTextController
-                                            .clear();
-                                        Get.find<SearchControllerCustom>()
-                                            .searchText = '';
-                                        homeController.myOrders.clear();
-                                        BottomNavigationController
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              child: Align(
+                                alignment: Alignment.topRight,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Get.find<SearchControllerCustom>()
+                                        .serachTextController
+                                        .clear();
+                                    Get.find<SearchControllerCustom>()
+                                        .searchText = '';
+                                    homeController.myOrders.clear();
+                                    BottomNavigationController
                                         bottomNavigationController =
                                         Get.find<BottomNavigationController>();
-                                        bottomNavigationController.setIndex(0, 0);
-                                        Get.off(() =>
-                                            BottomNavigationBarScreen(index: 0));
-                                      },
-                                      child: Container(
-                                        margin:
+                                    bottomNavigationController.setIndex(0, 0);
+                                    Get.off(() =>
+                                        BottomNavigationBarScreen(index: 0));
+                                  },
+                                  child: Container(
+                                    margin:
                                         EdgeInsets.only(right: 2.w, top: 2.h),
-                                        child: Text(
-                                          "Skip",
-                                          textAlign: TextAlign.end,
-                                          style:
+                                    child: Text(
+                                      "Skip",
+                                      textAlign: TextAlign.end,
+                                      style:
                                           Get.textTheme.titleMedium!.copyWith(
-                                            color: whiteColor,
-                                          ),
-                                        ).tr(),
+                                        color: whiteColor,
                                       ),
-                                    ),
+                                    ).tr(),
                                   ),
                                 ),
-                                SizedBox(height: Get.height * 0.01),
-                                Image.asset(
-                                  "assets/images/splash.png",
-                                  fit: BoxFit.cover,
-                                  height: Get.height * 0.15,
-                                ),
-                              ],
-                            )))),
+                              ),
+                            ),
+                            SizedBox(height: Get.height * 0.01),
+                            Image.asset(
+                              "assets/images/splash.png",
+                              fit: BoxFit.cover,
+                              height: Get.height * 0.15,
+                            ),
+                          ],
+                        )))),
                 Container(
                     width: Get.width,
                     margin: EdgeInsets.symmetric(horizontal: Get.width * 0.03),
@@ -115,10 +115,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text('Login to Astroway',
-                                style: Get.textTheme.titleMedium!.copyWith(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w800),
-                                textAlign: TextAlign.center)
+                                    style: Get.textTheme.titleMedium!.copyWith(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w800),
+                                    textAlign: TextAlign.center)
                                 .tr(),
                           ],
                         ),
@@ -133,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.white,
                                   borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                                      BorderRadius.all(Radius.circular(10)),
                                   border: Border.all(color: Colors.grey),
                                 ),
                                 child: Padding(
@@ -141,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: SizedBox(
                                     child: Theme(
                                       data: ThemeData(
-                                        dialogTheme: DialogTheme(
+                                        dialogTheme: DialogThemeData(
                                           contentTextStyle: const TextStyle(
                                               color: Colors.white),
                                           backgroundColor: Colors.grey[800],
@@ -152,23 +152,25 @@ class _LoginScreenState extends State<LoginScreen> {
                                       child: SizedBox(
                                         child: InternationalPhoneNumberInput(
                                           textFieldController:
-                                          loginController.phoneController,
+                                              loginController.phoneController,
                                           inputDecoration:
-                                          const InputDecoration(
-                                              border: InputBorder.none,
-                                              hintText: 'Phone number',
-                                              hintStyle: TextStyle(
-                                                color: Colors.grey,
-                                                fontSize: 16,
-                                                fontFamily:
-                                                "verdana_regular",
-                                                fontWeight: FontWeight.w400,
-                                              )),
-
+                                              const InputDecoration(
+                                                  border: InputBorder.none,
+                                                  hintText: 'Phone number',
+                                                  hintStyle: TextStyle(
+                                                    color: Colors.grey,
+                                                    fontSize: 16,
+                                                    fontFamily:
+                                                        "verdana_regular",
+                                                    fontWeight: FontWeight.w400,
+                                                  )),
                                           onInputValidated: (bool value) {
-                                            loginController.countryvalidator = value;
-                                            loginController.update(); // If using GetX or setState if you're using StatefulWidget
-                                            print("Number valid? ${loginController.countryvalidator}");
+                                            loginController.countryvalidator =
+                                                value;
+                                            loginController
+                                                .update(); // If using GetX or setState if you're using StatefulWidget
+                                            print(
+                                                "Number valid? ${loginController.countryvalidator}");
                                           },
                                           selectorConfig: const SelectorConfig(
                                             leadingPadding: 2,
@@ -177,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                           ignoreBlank: false,
                                           autoValidateMode:
-                                          AutovalidateMode.disabled,
+                                              AutovalidateMode.disabled,
                                           selectorTextStyle: const TextStyle(
                                               color: Colors.black),
                                           searchBoxDecoration: InputDecoration(
@@ -235,7 +237,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                         loginController.phoneController.text;
                                     log('phone no is $phoneno');
                                     global.showOnlyLoaderDialog(Get.context);
-                                   await loginController.startHeadlessWithWhatsapp('phone');
+                                    await loginController
+                                        .startHeadlessWithWhatsapp('phone');
                                   } else {
                                     global.showToast(
                                       message: "Invalid Number",
@@ -256,7 +259,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
+                                        MainAxisAlignment.spaceEvenly,
                                     children: [
                                       SizedBox(
                                         width: 10,
@@ -289,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   decoration: BoxDecoration(
                                       border: Border.all(color: Colors.grey),
                                       borderRadius:
-                                      BorderRadius.circular(10.sp)),
+                                          BorderRadius.circular(10.sp)),
                                   width: 100.w,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -319,7 +322,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   decoration: BoxDecoration(
                                       border: Border.all(color: Colors.grey),
                                       borderRadius:
-                                      BorderRadius.circular(10.sp)),
+                                          BorderRadius.circular(10.sp)),
                                   width: 100.w,
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -361,8 +364,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ).tr(),
                                   ),
                                   Text(' and ',
-                                      style: TextStyle(
-                                          color: Colors.grey, fontSize: 11))
+                                          style: TextStyle(
+                                              color: Colors.grey, fontSize: 11))
                                       .tr(),
                                   GestureDetector(
                                     onTap: () {
@@ -453,11 +456,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                       borderRadius: BorderRadius.zero),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 15, horizontal: 6)
+                                            vertical: 15, horizontal: 6)
                                         .copyWith(bottom: 10),
                                     child: Row(
                                       mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
+                                          MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Column(
                                           children: [
@@ -466,12 +469,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                               width: 70,
                                               decoration: BoxDecoration(
                                                 borderRadius:
-                                                BorderRadius.circular(7),
+                                                    BorderRadius.circular(7),
                                                 color: Colors.grey[200],
                                               ),
                                               child: Padding(
                                                 padding:
-                                                const EdgeInsets.all(10),
+                                                    const EdgeInsets.all(10),
                                                 child: Image.asset(
                                                   Images.confidential,
                                                   height: 45,
@@ -499,12 +502,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                               width: 70,
                                               decoration: BoxDecoration(
                                                 borderRadius:
-                                                BorderRadius.circular(7),
+                                                    BorderRadius.circular(7),
                                                 color: Colors.grey[200],
                                               ),
                                               child: Padding(
                                                 padding:
-                                                const EdgeInsets.all(10),
+                                                    const EdgeInsets.all(10),
                                                 child: Image.asset(
                                                   Images.verifiedAccount,
                                                   height: 45,
@@ -532,12 +535,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                               width: 70,
                                               decoration: BoxDecoration(
                                                 borderRadius:
-                                                BorderRadius.circular(7),
+                                                    BorderRadius.circular(7),
                                                 color: Colors.grey[200],
                                               ),
                                               child: Padding(
                                                 padding:
-                                                const EdgeInsets.all(10),
+                                                    const EdgeInsets.all(10),
                                                 child: Image.asset(
                                                   Images.payment,
                                                   height: 45,

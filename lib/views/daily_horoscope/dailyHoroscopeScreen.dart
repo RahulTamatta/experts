@@ -11,7 +11,7 @@ import 'package:AstrowayCustomer/utils/images.dart';
 import 'package:AstrowayCustomer/views/liveAstrologerList.dart';
 import 'package:AstrowayCustomer/views/live_astrologer/live_astrologer_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:custom_clippers/custom_clippers.dart';
+// import 'package:custom_clippers/custom_clippers.dart'; // Removed due to Canvas API incompatibility
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +24,40 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../widget/contactAstrologerBottomButton.dart';
 import '../../widget/timeWiseHoroscopeWidget.dart';
+
+// Simple replacement for MultiplePointsClipper
+class MultiplePointsClipper extends CustomClipper<Path> {
+  final int numberOfSides;
+  final int? numberOfPoints;
+  final double? heightOfPoint;
+  
+  MultiplePointsClipper(
+    this.numberOfSides, {
+    this.numberOfPoints,
+    this.heightOfPoint,
+  });
+  
+  @override
+  Path getClip(Size size) {
+    return Path()..addRect(Rect.fromLTWH(0, 0, size.width, size.height));
+  }
+  
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+}
+
+// Simple replacement for Sides enum
+class Sides {
+  static const int BOTTOM = 1;
+  static const int TOP = 2;
+  static const int LEFT = 3;
+  static const int RIGHT = 4;
+  
+  static int get bottom => BOTTOM;
+  static int get top => TOP;
+  static int get left => LEFT;
+  static int get right => RIGHT;
+}
 
 class DailyHoroscopeScreen extends StatefulWidget {
   DailyHoroscopeScreen({Key? key}) : super(key: key);

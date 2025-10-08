@@ -42,9 +42,7 @@
                     android:scheme="https"
                     android:host="com.astrowaydiploy.user"
                     />
-                <data
-                    android:host="otpless"
-                    android:scheme= "otpless.egn337d0735vtpmtq213"/>
+                <!-- OTPless data removed - using Firebase Auth instead -->
             </intent-filter>
         </activity>
         <meta-data android:name="com.google.android.geo.API_KEY"

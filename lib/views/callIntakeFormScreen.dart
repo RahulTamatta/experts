@@ -57,7 +57,6 @@ class CallIntakeFormScreen extends StatefulWidget {
 }
 
 class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
-
   SplashController splashController = Get.find<SplashController>();
 
   BottomNavigationController bottomNavigationController =
@@ -124,17 +123,18 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child:
-                        Theme(
+                        child: Theme(
                           data: ThemeData(
-                            dialogTheme: DialogTheme(
-                              contentTextStyle: const TextStyle(color: Colors.white),
+                            dialogTheme: DialogThemeData(
+                              contentTextStyle:
+                                  const TextStyle(color: Colors.white),
                               backgroundColor: Colors.grey[800],
                               surfaceTintColor: Colors.grey[800],
                             ),
                           ),
                           child: InternationalPhoneNumberInput(
-                            textFieldController: callIntakeController.phoneController,
+                            textFieldController:
+                                callIntakeController.phoneController,
                             inputDecoration: const InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Phone number',
@@ -153,30 +153,33 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                             ),
                             ignoreBlank: false,
                             autoValidateMode: AutovalidateMode.disabled,
-                            selectorTextStyle: const TextStyle(color: Colors.black),
+                            selectorTextStyle:
+                                const TextStyle(color: Colors.black),
                             searchBoxDecoration: InputDecoration(
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(2.w)),
-                                  borderSide: const BorderSide(color: Colors.white),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(2.w)),
+                                  borderSide:
+                                      const BorderSide(color: Colors.white),
                                 ),
                                 hintText: "Search",
                                 hintStyle: const TextStyle(
                                   color: Colors.black,
                                 )),
-                            initialValue: PhoneNumber(isoCode: 'IN') ,
+                            initialValue: PhoneNumber(isoCode: 'IN'),
                             formatInput: false,
                             keyboardType: const TextInputType.numberWithOptions(
                                 signed: true, decimal: false),
                             inputBorder: InputBorder.none,
                             onSaved: (PhoneNumber number) {
-                              callIntakeController.updateCountryCode(number.dialCode);
+                              callIntakeController
+                                  .updateCountryCode(number.dialCode);
                             },
                             onFieldSubmitted: (value) {
                               log('On onFieldSubmitted: $value');
                               FocusScope.of(context).unfocus();
                             },
-                            onInputChanged: (PhoneNumber number) {
-                              },
+                            onInputChanged: (PhoneNumber number) {},
                             onSubmit: () {
                               FocusScope.of(context).unfocus();
                             },
@@ -396,11 +399,12 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                           CustomText(text: "Don't know ")
                         ],
                       ),
-                      SizedBox(height: 10,)
+                      SizedBox(
+                        height: 10,
+                      )
                     ],
                   ),
                 ),
-
                 InkWell(
                   onTap: () {
                     callIntakeController.namefocus.unfocus();
@@ -610,7 +614,9 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                                 CustomText(text: "Don't know ")
                               ],
                             ),
-                            SizedBox(height: 10,)
+                            SizedBox(
+                              height: 10,
+                            )
                           ],
                         ),
                       ),
@@ -644,8 +650,7 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
       bottomSheet: GetBuilder<IntakeController>(builder: (intakeController) {
         return CustomBottomButton(
           onTap: () async {
-            double charge = double.parse(widget.rate
-                .toString());
+            double charge = double.parse(widget.rate.toString());
             //double totalMin=int.parse(global.splashController.currentUser!.walletAmount.toString().split(".").first)/int.parse(charge.toString().split(".").first);
             if (charge * time[selectTime] <=
                     global.splashController.currentUser!.walletAmount! ||
@@ -659,8 +664,7 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                   textColor: global.textColor,
                   bgColor: global.toastBackGoundColor,
                 );
-              }
-              else {
+              } else {
                 // print("lat:- ${callIntakeController.lat}");
                 // print("long:- ${callIntakeController.long}");
                 // print("timezone:- ${callIntakeController.tzone}");
@@ -672,10 +676,12 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                     await intakeController.checkFreeSessionAvailable();
                     if (intakeController.isAddNewRequestByFreeuser == true) {
                       //! false for testing
-                      if (widget.type == "Call" || widget.type == "Videocall")
-                      {
+                      if (widget.type == "Call" || widget.type == "Videocall") {
                         await callController.sendCallRequest(
-                            widget.astrologerId, true, widget.type, callIntakeController.freedefaultTime.toString());
+                            widget.astrologerId,
+                            true,
+                            widget.type,
+                            callIntakeController.freedefaultTime.toString());
                       } else {
                         ChatController chatController =
                             Get.find<ChatController>();
@@ -700,7 +706,9 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                               false);
                         }
                         await chatController.sendChatRequest(
-                            widget.astrologerId, true, callIntakeController.freedefaultTime.toString());
+                            widget.astrologerId,
+                            true,
+                            callIntakeController.freedefaultTime.toString());
                       }
                     } else {
                       global.showToast(
@@ -709,15 +717,19 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                           textColor: global.textColor,
                           bgColor: Colors.white);
                     }
-                  }
-                  else {
+                  } else {
                     if (widget.type == "Call" || widget.type == "Videocall") {
-                      await callController.sendCallRequest(widget.astrologerId,
-                          false, widget.type,
-                          (int.parse(time[selectTime].toString().split(".").first) * 60).toString()
-                          );
-                    }
-                    else {
+                      await callController.sendCallRequest(
+                          widget.astrologerId,
+                          false,
+                          widget.type,
+                          (int.parse(time[selectTime]
+                                      .toString()
+                                      .split(".")
+                                      .first) *
+                                  60)
+                              .toString());
+                    } else {
                       ChatController chatController =
                           Get.find<ChatController>();
                       DropDownController dropDownController =
@@ -740,10 +752,15 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                             widget.astrologerId,
                             false);
                       }
-                      await chatController.sendChatRequest(widget.astrologerId,
+                      await chatController.sendChatRequest(
+                          widget.astrologerId,
                           false,
-                          (int.parse(time[selectTime].toString().split(".").first) * 60).toString()
-                      );
+                          (int.parse(time[selectTime]
+                                      .toString()
+                                      .split(".")
+                                      .first) *
+                                  60)
+                              .toString());
                     }
                   }
                   global.hideLoader();
@@ -756,8 +773,7 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                   );
                 }
               }
-            }
-            else {
+            } else {
               log("ajksndkjnaskjndk");
               global.showOnlyLoaderDialog(context);
               await walletController.getAmount();
@@ -960,7 +976,7 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                               backgroundColor: Get.theme.primaryColor,
                               child: CachedNetworkImage(
                                   imageUrl:
-                                  '${global.imgBaseurl}${splashController.currentUser!.profile}',
+                                      '${global.imgBaseurl}${splashController.currentUser!.profile}',
                                   imageBuilder: (context, imageProvider) =>
                                       CircleAvatar(
                                         radius: 28,
@@ -972,7 +988,7 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                                       CircleAvatar(
                                         radius: 28,
                                         backgroundImage:
-                                        AssetImage(Images.deafultUser),
+                                            AssetImage(Images.deafultUser),
                                       )),
                             ),
                             SizedBox(height: 2),
@@ -1004,7 +1020,7 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                               backgroundColor: Get.theme.primaryColor,
                               child: CachedNetworkImage(
                                   imageUrl:
-                                  '${global.imgBaseurl}${widget.astrologerProfile}',
+                                      '${global.imgBaseurl}${widget.astrologerProfile}',
                                   imageBuilder: (context, imageProvider) =>
                                       CircleAvatar(
                                         radius: 28,
@@ -1016,7 +1032,7 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                                       CircleAvatar(
                                         radius: 28,
                                         backgroundImage:
-                                        AssetImage(Images.deafultUser),
+                                            AssetImage(Images.deafultUser),
                                       )),
                             ),
                             SizedBox(height: 2),
@@ -1070,7 +1086,7 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                         ),
                       ),
                       Column(
-                        // mainAxisAlignment: MainAxisAlignment.center,
+                          // mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             SizedBox(height: 2),
@@ -1133,7 +1149,7 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
             ),
             actionsAlignment: MainAxisAlignment.spaceBetween,
             actionsPadding:
-            const EdgeInsets.only(bottom: 15, left: 15, right: 15),
+                const EdgeInsets.only(bottom: 15, left: 15, right: 15),
           ),
         );
       },
@@ -1375,5 +1391,4 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
     //   },
     // );
   }
-
 }
