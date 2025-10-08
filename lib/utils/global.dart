@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:AstrowayCustomer/controllers/splashController.dart';
 import 'package:AstrowayCustomer/model/current_user_model.dart';
 import 'package:AstrowayCustomer/model/hororscopeSignModel.dart';
+import 'package:AstrowayCustomer/model/systemFlagModel.dart';
 import 'package:AstrowayCustomer/model/systemFlagNameListModel.dart';
 import 'package:AstrowayCustomer/utils/services/api_helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -454,9 +455,35 @@ String getSystemFlagValue(String flag) {
 }
 
 String getSystemFlagValueForLogin(String flag) {
-  String value =
-      splashController.syatemFlag.firstWhere((e) => e.name == flag).value;
-  return splashController.syatemFlag.firstWhere((e) => e.name == flag).value;
+  try {
+    if (splashController.syatemFlag.isEmpty) {
+      print('Warning: System flags not loaded, returning default value for $flag');
+      return getDefaultSystemFlagValue(flag);
+    }
+    var flagItem = splashController.syatemFlag.firstWhere(
+      (e) => e.name == flag,
+      orElse: () => SystemFlag(name: flag, value: getDefaultSystemFlagValue(flag)),
+    );
+    return flagItem.value;
+  } catch (e) {
+    print('Error getting system flag $flag: $e');
+    return getDefaultSystemFlagValue(flag);
+  }
+}
+
+String getDefaultSystemFlagValue(String flag) {
+  switch (flag) {
+    case 'appName':
+      return 'AstroWay';
+    case 'currencySymbol':
+      return '₹';
+    case 'minCallDuration':
+      return '5';
+    case 'minChatDuration':
+      return '5';
+    default:
+      return '';
+  }
 }
 
 showToast(

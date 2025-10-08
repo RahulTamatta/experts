@@ -3150,6 +3150,8 @@ class APIHelper {
     } catch (e) {
       debugPrint(
           "Exception: api_helper.dart - getSystemFlag(): " + e.toString());
+      // Return a proper APIResult with error status and empty list
+      return APIResult(status: "500", recordList: <SystemFlag>[]);
     }
   }
 

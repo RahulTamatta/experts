@@ -287,15 +287,21 @@ class SplashController extends GetxController {
         if (result) {
           global.sp = await SharedPreferences.getInstance();
           await apiHelper.getSystemFlag().then((result) {
-            if (result.status == "200") {
-              syatemFlag = result.recordList;
+            if (result != null && result.status == "200") {
+              syatemFlag = result.recordList ?? <SystemFlag>[];
               update();
-            } else {}
+            } else {
+              print('Failed to load system flags, using empty list');
+              syatemFlag = <SystemFlag>[];
+              update();
+            }
           });
         }
       });
     } catch (e) {
       print('Exception in getSystemFlag():' + e.toString());
+      syatemFlag = <SystemFlag>[];
+      update();
     }
   }
 }
