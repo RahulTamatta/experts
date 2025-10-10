@@ -33,7 +33,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: "381086206621",
     projectId: "astroway-diploy",
     storageBucket: "astroway-diploy.appspot.com",
-    iosBundleId: 'com.astrowaydiploy.user',
+    iosBundleId: 'com.nexora.fittalk',
     measurementId: "G-KBPRBBZRYC",
   );
 

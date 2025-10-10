@@ -55,7 +55,7 @@
 			<string>Bundle Id</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.astrowaydiploy.user</string>
+				<string>com.nexora.fittalk</string>
 			</array>
 		</dict>
 	</array>

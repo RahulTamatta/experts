@@ -1,52 +1,44 @@
 {
   "project_info": {
-    "project_number": "381086206621",
-    "firebase_url": "https://astroway-diploy-default-rtdb.firebaseio.com",
-    "project_id": "astroway-diploy",
-    "storage_bucket": "astroway-diploy.appspot.com"
+    "project_number": "11780657341",
+    "project_id": "fittalk-ed0e7",
+    "storage_bucket": "fittalk-ed0e7.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:381086206621:android:f21e5cf69a3fbcc632e274",
+        "mobilesdk_app_id": "1:11780657341:android:64add57cd842a56ae3e7d4",
         "android_client_info": {
-          "package_name": "com.astrowaydiploy.astrologer"
+          "package_name": "com.nexora.fittalk"
         }
       },
-      "oauth_client": [],
-      "api_key": [
+      "oauth_client": [
         {
-          "current_key": "AIzaSyAyiZi-oi6QilI2X-7hNcCgtbmRT2WLAhs"
+          "client_id": "11780657341-76gfrm75celc14bnssu2ouvb0ghh94a2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nexora.fittalk",
+            "certificate_hash": "d83b60fbc51f6e2fb63322a586d5f6e89ee734d7"
+          }
         },
         {
-          "current_key": "AIzaSyBNWnN2vKDFSOtxh3eTwa1L5yiFxaYsxts"
+          "client_id": "11780657341-p7sernch3nlq7r992g2opnafn5g9snrs.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArHRbVqytdARFlufcMHfsZY7T3l8zsMOw"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:381086206621:android:f82a6af18b824fbd32e274",
-        "android_client_info": {
-          "package_name": "com.astrowaydiploy.user"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAyiZi-oi6QilI2X-7hNcCgtbmRT2WLAhs"
-        },
-        {
-          "current_key": "AIzaSyBNWnN2vKDFSOtxh3eTwa1L5yiFxaYsxts"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "11780657341-p7sernch3nlq7r992g2opnafn5g9snrs.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

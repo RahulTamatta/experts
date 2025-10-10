@@ -17,8 +17,8 @@ class TermAndConditionScreen extends StatelessWidget {
             title: 'Terms and Condition',
           )),
       body: InAppWebView(
-        initialUrlRequest: URLRequest(
-            url: WebUri('https://astroway.diploy.in/terms-condition')),
+        initialUrlRequest:
+            URLRequest(url: WebUri('https://clubtrusted.in/terms-condition')),
         initialSettings: InAppWebViewSettings(
           javaScriptEnabled: true,
           transparentBackground: true,

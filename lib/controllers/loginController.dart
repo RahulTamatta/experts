@@ -1,19 +1,20 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:io';
+// dart:io removed - no longer needed
 import 'package:AstrowayCustomer/controllers/homeController.dart';
 import 'package:AstrowayCustomer/controllers/splashController.dart';
 import 'package:AstrowayCustomer/main.dart';
 import 'package:AstrowayCustomer/model/login_model.dart';
 import 'package:AstrowayCustomer/utils/services/api_helper.dart';
 import 'package:AstrowayCustomer/views/loginScreen.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:get/get.dart';
-import 'package:otpless_flutter/otpless_flutter.dart';
+// OTPless removed - now using Firebase Auth
 
 import '../model/device_info_login_model.dart';
 import '../utils/global.dart';
@@ -54,39 +55,99 @@ class LoginController extends GetxController {
           //     .toString()),
           ""
       );
-    } else {
       Fluttertoast.showToast(msg: "Invalid Otp");
       hideLoader();
     }
   }
 
+  // Firebase Auth method - replaces OTPless
   Future<void> startHeadlessWithWhatsapp(String type, {bool? resendOtp=false}) async {
-    if (Platform.isAndroid) {
-      otplessFlutterPlugin.initHeadless(appId);
-      otplessFlutterPlugin.setHeadlessCallback(onHeadlessResult);
-      debugPrint("init headless sdk is called for android");
+    try {
+      if (type == "GMAIL") {
+        // Gmail authentication using Firebase Auth + Google Sign-In
+        await signInWithGoogle();
+      } else {
+        // WhatsApp/Phone authentication using Firebase Phone Auth
+        debugPrint("Using Firebase Auth for phone OTP verification");
+        
+        if (resendOtp == true) {
+          await resendOTP();
+        } else {
+          await sendOTP();
+        }
+      }
+    } catch (e) {
+      global.hideLoader();
+      global.showToast(
+        message: "Authentication failed: ${e.toString()}",
+        textColor: Colors.white,
+        bgColor: Colors.red,
+      );
+      print("Error in startHeadlessWithWhatsapp: $e");
     }
-    if (Platform.isIOS && !isInitIos) {
-      otplessFlutterPlugin.initHeadless(appId);
-      otplessFlutterPlugin.setHeadlessCallback(onHeadlessResult);
-      isInitIos = true;
-      debugPrint("init headless sdk is called for ios");
+  }
+
+  // Google Sign-In method using Firebase Auth + Google Sign-In
+  Future<void> signInWithGoogle() async {
+    try {
+      // Initialize Google Sign-In
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      
+      if (googleUser == null) {
+        // User cancelled the sign-in
+        global.hideLoader();
+        global.showToast(
+          message: "Google Sign-In cancelled",
+          textColor: Colors.white,
+          bgColor: Colors.grey,
+        );
+        return;
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // Sign in to Firebase with the Google credential
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      
+      if (userCredential.user != null) {
+        String email = userCredential.user!.email ?? "";
+        String name = userCredential.user!.displayName ?? "";
+        print("Google Sign-In successful: $email ($name)");
+        
+        global.hideLoader();
+        global.showToast(
+          message: "Google Sign-In successful! Welcome $name",
+          textColor: Colors.white,
+          bgColor: Colors.green,
+        );
+        
+        // Call the existing login API with email
+        await loginAndSignupUser(null, email);
+      }
+    } catch (e) {
+      global.hideLoader();
+      global.showToast(
+        message: "Google Sign-In failed: ${e.toString()}",
+        textColor: Colors.white,
+        bgColor: Colors.red,
+      );
+      print("Error in Google Sign-In: $e");
     }
-    Map<String, dynamic> arg = type == "phone"
-        ? {'phone': '${phoneController.text}', 'countryCode':selectedCountryCode}
-        : {
-      'channelType': "$type",
-    };
-    print("resend otp:- ${resendOtp}");
-    type == "phone"
-        ? otplessFlutterPlugin.startHeadless(resendOtp==true?onResendotp:onHeadlessResultPhone, arg)
-        : otplessFlutterPlugin.startHeadless(onHeadlessResult, arg);
   }
 
   void onHeadlessResult(dynamic result) async {
     print("email data");
     print("${dataResponse['response']}");
-    dataResponse = result;
     if (dataResponse['response']['status'].toString() == "SUCCESS") {
       if (dataResponse['response']['identities'][0]['identityType']
           .toString() ==
@@ -137,14 +198,14 @@ class LoginController extends GetxController {
     // whatsapplogindetailsModelFromJson(dataResponse);
   }
 
-  final otplessFlutterPlugin = Otpless();
+  // OTPless removed - Firebase Auth is now used
   var loaderVisibility = true;
   final TextEditingController urlTextContoller = TextEditingController();
   Map dataResponse = {};
   String phoneOrEmail = '';
   String otp = '';
   bool isInitIos = false;
-  static const String appId = "EGN337D0735VTPMTQY22";
+  // OTPless app ID removed - using Firebase Auth
 
   timer() {
     maxSecond = 60;
@@ -219,6 +280,146 @@ class LoginController extends GetxController {
     } catch (e) {
       global.hideLoader();
       print("Exception in loginAndSignupUser():-" + e.toString());
+    }
+  }
+
+  // Firebase Auth Methods
+  String _verificationId = "";
+  
+  // Helper method to format phone number to E.164 format
+  String _formatPhoneNumberToE164(String countryCode, String phoneNumber) {
+    // Remove any non-digit characters from phone number
+    String cleanPhone = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+    
+    // Ensure country code starts with +
+    String cleanCountryCode = countryCode.startsWith('+') ? countryCode : '+$countryCode';
+    
+    // Remove leading zeros from phone number
+    cleanPhone = cleanPhone.replaceFirst(RegExp(r'^0+'), '');
+    
+    // Combine country code and phone number
+    String e164Number = cleanCountryCode + cleanPhone;
+    
+    print("Original: $countryCode $phoneNumber -> E.164: $e164Number");
+    return e164Number;
+  }
+  
+  Future<void> sendOTP() async {
+    try {
+      // Validate inputs
+      if (phoneController.text.isEmpty) {
+        global.showToast(
+          message: "Please enter phone number",
+          textColor: Colors.white,
+          bgColor: Colors.red,
+        );
+        return;
+      }
+      
+      if (selectedCountryCode.isEmpty) {
+        global.showToast(
+          message: "Please select country code",
+          textColor: Colors.white,
+          bgColor: Colors.red,
+        );
+        return;
+      }
+      
+      // Format phone number to E.164 format for Firebase
+      String phoneNumber = _formatPhoneNumberToE164(selectedCountryCode, phoneController.text);
+      print("Formatted phone number for Firebase: $phoneNumber");
+      
+      // Validate E.164 format
+      if (!RegExp(r'^\+[1-9]\d{1,14}$').hasMatch(phoneNumber)) {
+        global.showToast(
+          message: "Please enter a valid phone number",
+          textColor: Colors.white,
+          bgColor: Colors.red,
+        );
+        return;
+      }
+      
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: phoneNumber,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          // Auto-verification completed
+          await _signInWithCredential(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          global.hideLoader();
+          global.showToast(
+            message: "Verification failed: ${e.message}",
+            textColor: Colors.white,
+            bgColor: Colors.red,
+          );
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          _verificationId = verificationId;
+          timer();
+          Get.to(() => VerifyPhoneScreen(phoneNumber: phoneController.text));
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          _verificationId = verificationId;
+        },
+        timeout: const Duration(seconds: 60),
+      );
+    } catch (e) {
+      global.hideLoader();
+      print("Error sending OTP: $e");
+    }
+  }
+
+  Future<void> verifyOTP(String otpCode) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: _verificationId,
+        smsCode: otpCode,
+      );
+      
+      await _signInWithCredential(credential);
+    } catch (e) {
+      global.hideLoader();
+      global.showToast(
+        message: "Invalid OTP",
+        textColor: Colors.white,
+        bgColor: Colors.red,
+      );
+      print("Error verifying OTP: $e");
+    }
+  }
+
+  Future<void> _signInWithCredential(PhoneAuthCredential credential) async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      
+      if (userCredential.user != null) {
+        String firebasePhoneNumber = userCredential.user!.phoneNumber ?? "";
+        print("Firebase returned phone number: $firebasePhoneNumber");
+        
+        // Extract phone number without country code for API call
+        String cleanCountryCode = selectedCountryCode.startsWith('+') ? selectedCountryCode : '+$selectedCountryCode';
+        String cleanPhoneNumber = firebasePhoneNumber.replaceFirst(cleanCountryCode, "");
+        
+        // Remove any leading zeros
+        cleanPhoneNumber = cleanPhoneNumber.replaceFirst(RegExp(r'^0+'), '');
+        
+        print("Clean phone number for API: $cleanPhoneNumber");
+        await loginAndSignupUser(int.parse(cleanPhoneNumber), "");
+      }
+    } catch (e) {
+      global.hideLoader();
+      global.showToast(
+        message: "Sign in failed",
+        textColor: Colors.white,
+        bgColor: Colors.red,
+      );
+      print("Error signing in: $e");
+    }
+  }
+
+  Future<void> resendOTP() async {
+    if (maxSecond <= 0) {
+      await sendOTP();
     }
   }
 }

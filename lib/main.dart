@@ -46,7 +46,13 @@ final _localNotifications = FlutterLocalNotificationsPlugin();
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("_firebaseMessagingBackgroundHandler a background message: ${message.messageId}");
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Initialize Firebase only if not already initialized
+  try {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  } catch (e) {
+    // Firebase already initialized, continue
+    log("Firebase already initialized in background handler: $e");
+  }
   await GetStorage.init();
   global.sp = await SharedPreferences.getInstance();
   if (global.sp!.getString("currentUser") != null) {
@@ -232,7 +238,15 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  
+  // Initialize Firebase only if not already initialized
+  try {
+    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    log("Firebase initialized successfully in main");
+  } catch (e) {
+    log("Firebase initialization error (likely already initialized): $e");
+    // Continue execution even if Firebase is already initialized
+  }
   FirebaseMessaging messaging = FirebaseMessaging.instance;
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await messaging.requestPermission(

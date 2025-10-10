@@ -55,14 +55,14 @@ final DateFormat formatter = DateFormat("dd MMM yy, hh:mm a");
 
 String stripeBaseApi = 'https://api.stripe.com/v1';
 
-String baseUrl = "https://astroway.diploy.in/api";
-String imgBaseurl = "https://astroway.diploy.in/";
-String webBaseUrl = "https://astroway.diploy.in/api/";
+String baseUrl = "https://clubtrusted.in/api";
+String imgBaseurl = "https://clubtrusted.in/";
+String webBaseUrl = "https://clubtrusted.in/api/";
 String appMode = "LIVE";
 Map<String, dynamic> appParameters = {
   "LIVE": {
-    "apiUrl": "https://astroway.diploy.in/api",
-    "imageBaseurl": "https://astroway.diploy.in/",
+    "apiUrl": "https://clubtrusted.in/api",
+    "imageBaseurl": "https://clubtrusted.in/",
   },
   "DEV": {
     "apiUrl": "http://192.168.29.223:8001/api",
@@ -457,12 +457,14 @@ String getSystemFlagValue(String flag) {
 String getSystemFlagValueForLogin(String flag) {
   try {
     if (splashController.syatemFlag.isEmpty) {
-      print('Warning: System flags not loaded, returning default value for $flag');
+      print(
+          'Warning: System flags not loaded, returning default value for $flag');
       return getDefaultSystemFlagValue(flag);
     }
     var flagItem = splashController.syatemFlag.firstWhere(
       (e) => e.name == flag,
-      orElse: () => SystemFlag(name: flag, value: getDefaultSystemFlagValue(flag)),
+      orElse: () =>
+          SystemFlag(name: flag, value: getDefaultSystemFlagValue(flag)),
     );
     return flagItem.value;
   } catch (e) {

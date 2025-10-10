@@ -14,7 +14,7 @@
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity
-            android:name="com.astrowaydiploy.user.MainActivity"
+            android:name="com.nexora.fittalk.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/LaunchTheme"
@@ -40,7 +40,7 @@
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data
                     android:scheme="https"
-                    android:host="com.astrowaydiploy.user"
+                    android:host="com.nexora.fittalk"
                     />
                 <!-- OTPless data removed - using Firebase Auth instead -->
             </intent-filter>

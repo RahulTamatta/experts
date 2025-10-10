@@ -128,8 +128,9 @@ class VerifyPhoneScreen extends StatelessWidget {
                           } else {
                             global.showOnlyLoaderDialog(context);
                             print("submit otp");
-                            loginController.otplessFlutterPlugin.startHeadless(
-                                loginController.onHeadlessResultVerify, arg);
+                            // OTPless removed - Firebase Auth is now used
+                            // Call Firebase OTP verification method
+                            loginController.verifyOTP(pinEditingControllerlogin.text);
                           }
                         } catch (e) {
                           global.hideLoader();

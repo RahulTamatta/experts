@@ -84,6 +84,7 @@ dependencies:
   firebase_core: ^3.12.1
   firebase_messaging: ^15.2.4
   firebase_storage: ^12.4.4
+  google_sign_in: ^6.2.1
 
   #LOCAL STORAGE
   shared_preferences: ^2.3.1
@@ -119,7 +120,7 @@ dependencies:
   file_picker: ^8.0.0+1
   open_file: ^3.3.2
   lecle_yoyo_player: ^0.0.8
-  otpless_flutter: ^2.1.4
+  # otpless_flutter: ^2.1.4  # Removed - using Firebase Auth
   pin_input_text_field: ^4.5.1
   flutter_callkit_incoming: ^2.0.4+1
   get_storage: ^2.1.1
