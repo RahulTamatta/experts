@@ -397,9 +397,63 @@ class _MyAppState extends State<MyApp> {
             var messageData = json.decode((message.data['body']));
             if (messageData['notificationType'] != null) {
               if (messageData['notificationType'] == 3) {
+                // ✅ WHATSAPP-LIKE: Auto-navigate to chat screen when accepted
+                log('🎉 [CUSTOMER] Chat request accepted - auto-navigating to chat');
+                
                 foregroundNotification(message, messageData['icon'] ?? "");
                 await player.setSource(AssetSource('ringtone.mp3'));
                 await player.resume();
+                
+                // Auto-accept and navigate instead of showing dialog
+                global.showOnlyLoaderDialog(Get.context!);
+                await chatController.acceptedChat(
+                  int.parse(messageData["chatId"].toString())
+                );
+                
+                global.callOnFcmApiSendPushNotifications(
+                  fcmTokem: [messageData["fcmToken"]],
+                  title: 'Start simple chat timer'
+                );
+                global.hideLoader();
+                
+                chatController.isInchat = true;
+                chatController.isEndChat = false;
+                TimerController timerController = Get.find<TimerController>();
+                timerController.startTimer();
+                chatController.update();
+                await player.stop();
+                
+                // Auto-navigate to chat screen
+                Get.to(() => AcceptChatScreen(
+                  flagId: 1,
+                  astrologerName: messageData["astrologerName"] ?? "Astrologer",
+                  profileImage: messageData["profile"]?.toString() ?? "",
+                  fireBasechatId: messageData["firebaseChatId"].toString(),
+                  astrologerId: messageData["astrologerId"],
+                  chatId: int.parse(messageData["chatId"].toString()),
+                  fcmToken: messageData["fcmToken"],
+                  duration: messageData['chat_duration'].toString(),
+                ));
+                
+                // Show bottom accept chat UI
+                chatController.showBottomAcceptChatRequest(
+                  astrologerId: messageData["astrologerId"],
+                  chatId: messageData["chatId"],
+                  astroName: messageData["astrologerName"] ?? "Astrologer",
+                  astroProfile: messageData["profile"] ?? "",
+                  firebaseChatId: messageData["firebaseChatId"],
+                  fcmToken: messageData["fcmToken"],
+                  duration: messageData['chat_duration'],
+                );
+                
+                
+                await FirebaseMessaging.instance
+                    .setForegroundNotificationPresentationOptions(
+                        alert: true, badge: true, sound: true);
+                log("✅ [CUSTOMER] Auto-navigated to chat screen");
+                
+                // OLD CODE: Show dialog (now replaced with auto-navigation)
+                /*
                 showDialog(
                     context: Get.context!,
                     barrierDismissible:
@@ -573,30 +627,6 @@ class _MyAppState extends State<MyApp> {
                               )
                             ],
                           ),
-                        ),
-                        actionsAlignment: MainAxisAlignment.spaceBetween,
-                        actionsPadding: const EdgeInsets.only(
-                            bottom: 15, left: 15, right: 15),
-                      );
-                    });
-                chatController.showBottomAcceptChatRequest(
-                  astrologerId: messageData["astrologerId"],
-                  chatId: messageData["chatId"],
-                  astroName: messageData["astrologerName"] == null
-                      ? "Astrologer"
-                      : messageData["astrologerName"],
-                  astroProfile: messageData["profile"] == null
-                      ? ""
-                      : messageData["profile"],
-                  firebaseChatId: messageData["firebaseChatId"],
-                  fcmToken: messageData["fcmToken"],
-                  duration: messageData['call_duration'],
-                );
-                foregroundNotification(message, messageData['icon'] ?? "");
-                await FirebaseMessaging.instance
-                    .setForegroundNotificationPresentationOptions(
-                        alert: true, badge: true, sound: true);
-                log("check4");
               } else if (messageData['notificationType'] == 1) {
                 //! calling code
 

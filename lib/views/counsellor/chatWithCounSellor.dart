@@ -1,8 +1,8 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:AstrowayCustomer/controllers/bottomNavigationController.dart';
+import 'package:AstrowayCustomer/controllers/chatController.dart';
 import 'package:AstrowayCustomer/controllers/counsellorController.dart';
-import 'package:AstrowayCustomer/views/callIntakeFormScreen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -177,14 +177,26 @@ class ChatWithCounSellor extends StatelessWidget {
                                   if (charge * 5 <= global.splashController.currentUser!.walletAmount!) {
                                     global.showOnlyLoaderDialog(context);
 
-                                    await Get.to(() => CallIntakeFormScreen(
-                                          type: "Chat",
-                                          astrologerId: counsellorController.counsellorList[index].id,
-                                          astrologerName: counsellorController.counsellorList[index].name,
-                                          astrologerProfile: counsellorController.counsellorList[index].profileImage ?? "",
-                                      rate: counsellorController.counsellorList[index].profileImage.toString(),
-                                        ));
-                                    global.hideLoader();
+                                    // BYPASS INTAKE FORM - Send direct chat request to counsellor
+                                    print('🎯 [COUNSELLOR CHAT] Sending direct chat request to ${counsellorController.counsellorList[index].name}');
+                                    
+                                    try {
+                                      ChatController chatController = Get.find<ChatController>();
+                                      await chatController.sendDirectChatRequest(
+                                        counsellorController.counsellorList[index].id,
+                                        counsellorController.counsellorList[index].name,
+                                      );
+                                      print('✅ [COUNSELLOR CHAT] Chat request completed');
+                                    } catch (e) {
+                                      print('❌ [COUNSELLOR CHAT] Chat error: ${e.toString()}');
+                                      global.showToast(
+                                        message: 'Failed to send chat request. Please try again.',
+                                        textColor: global.textColor,
+                                        bgColor: global.toastBackGoundColor,
+                                      );
+                                    } finally {
+                                      global.hideLoader();
+                                    }
                                   } else {
                                     global.showOnlyLoaderDialog(context);
                                     await walletController.getAmount();

@@ -106,6 +106,35 @@ class CallController extends GetxController
     }
   }
 
+  // WHATSAPP-LIKE FREE COMMUNICATION - Direct call without intake form
+  Future<void> sendDirectCallRequest(int astrologerId, String astrologerName, String type) async {
+    try {
+      print('📞 [FREE CALL] Starting direct $type request');
+      print('📞 [FREE CALL] Astrologer ID: $astrologerId');
+      print('📞 [FREE CALL] Astrologer Name: $astrologerName');
+      print('📞 [FREE CALL] Call Type: $type');
+      print('📞 [FREE CALL] User ID: ${global.currentUserId}');
+      
+      // Send call request with free session (no time limit)
+      await sendCallRequest(astrologerId, true, type, '999999');
+      
+      print('📞 [FREE CALL] $type request sent successfully');
+      
+      global.showToast(
+        message: '$type request sent to $astrologerName',
+        textColor: global.textColor,
+        bgColor: global.toastBackGoundColor,
+      );
+    } catch (e) {
+      print('❌ [FREE CALL] Exception: ${e.toString()}');
+      global.showToast(
+        message: 'Failed to send $type request',
+        textColor: global.textColor,
+        bgColor: global.toastBackGoundColor,
+      );
+    }
+  }
+
   acceptedCall(int callId) async {
     try {
       await apiHelper.acceptCall(callId).then((result) {

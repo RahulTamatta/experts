@@ -12,7 +12,6 @@ import 'package:AstrowayCustomer/utils/images.dart';
 import 'package:AstrowayCustomer/views/astromall/astromallScreen.dart';
 import 'package:AstrowayCustomer/views/astromall/productDetailScreen.dart';
 import 'package:AstrowayCustomer/views/bottomNavigationBarScreen.dart';
-import 'package:AstrowayCustomer/views/callIntakeFormScreen.dart';
 import 'package:AstrowayCustomer/views/liveAstrologerList.dart';
 import 'package:AstrowayCustomer/views/paymentInformationScreen.dart';
 import 'package:AstrowayCustomer/widget/popular_search_widget.dart';
@@ -787,17 +786,26 @@ class SearchAstrologerScreen extends StatelessWidget {
                                                                                 await bottomNavigationController.changeOfflineStatus(searchController.astrologerList[index].id, "Online");
                                                                               }
                                                                             }
-                                                                            await Get.to(() =>
-                                                                                CallIntakeFormScreen(
-                                                                                  type: type,
-                                                                                  // index: index,
-                                                                                  astrologerId: searchController.astrologerList[index].id!,
-                                                                                  astrologerName: searchController.astrologerList[index].name!,
-                                                                                  astrologerProfile: searchController.astrologerList[index].profileImage!,
-                                                                                  isFreeAvailable: searchController.astrologerList[index].isFreeAvailable!,
-                                                                                  rate: searchController.astrologerList[index].charge.toString(),
-                                                                                ));
-                                                                            global.hideLoader();
+                                                                            // BYPASS INTAKE FORM - Send direct chat request
+                                                                            print('🎯 [SEARCH] Sending direct chat request to ${searchController.astrologerList[index].name}');
+                                                                            
+                                                                            try {
+                                                                              ChatController chatController = Get.find<ChatController>();
+                                                                              await chatController.sendDirectChatRequest(
+                                                                                searchController.astrologerList[index].id!,
+                                                                                searchController.astrologerList[index].name!,
+                                                                              );
+                                                                              print('✅ [SEARCH] Chat request completed');
+                                                                            } catch (e) {
+                                                                              print('❌ [SEARCH] Chat error: ${e.toString()}');
+                                                                              global.showToast(
+                                                                                message: 'Failed to send chat request. Please try again.',
+                                                                                textColor: global.textColor,
+                                                                                bgColor: global.toastBackGoundColor,
+                                                                              );
+                                                                            } finally {
+                                                                              global.hideLoader();
+                                                                            }
                                                                           } else if (searchController.astrologerList[index].chatStatus == "Offline" ||
                                                                               searchController.astrologerList[index].chatStatus == "Wait Time" ||
                                                                               searchController.astrologerList[index].chatStatus == "Busy") {
@@ -902,16 +910,27 @@ class SearchAstrologerScreen extends StatelessWidget {
                                                                                                 await bottomNavigationController.changeOfflineCallStatus(searchController.astrologerList[index].id, "Online");
                                                                                               }
                                                                                             }
-                                                                                            await Get.to(() => CallIntakeFormScreen(
-                                                                                                  astrologerProfile: searchController.astrologerList[index].profileImage ?? '',
-                                                                                                  type: "Call",
-                                                                                                  astrologerId: searchController.astrologerList[index].id!,
-                                                                                                  astrologerName: searchController.astrologerList[index].name ?? '',
-                                                                                                  isFreeAvailable: searchController.astrologerList[index].isFreeAvailable!,
-                                                                                                  rate: searchController.astrologerList[index].charge!.toString(),
-                                                                                                ));
-
-                                                                                            global.hideLoader();
+                                                                                            // BYPASS INTAKE FORM - Send direct call request
+                                                                                            print('📞 [SEARCH] Sending direct call request to ${searchController.astrologerList[index].name}');
+                                                                                            
+                                                                                            try {
+                                                                                              CallController callController = Get.find<CallController>();
+                                                                                              await callController.sendDirectCallRequest(
+                                                                                                searchController.astrologerList[index].id!,
+                                                                                                searchController.astrologerList[index].name ?? '',
+                                                                                                "Call",
+                                                                                              );
+                                                                                              print('✅ [SEARCH] Call request completed');
+                                                                                            } catch (e) {
+                                                                                              print('❌ [SEARCH] Call error: ${e.toString()}');
+                                                                                              global.showToast(
+                                                                                                message: 'Failed to send call request. Please try again.',
+                                                                                                textColor: global.textColor,
+                                                                                                bgColor: global.toastBackGoundColor,
+                                                                                              );
+                                                                                            } finally {
+                                                                                              global.hideLoader();
+                                                                                            }
                                                                                           } else if (searchController.astrologerList[index].callStatus == "Offline" || searchController.astrologerList[index].callStatus == "Wait Time" || searchController.astrologerList[index].callStatus == "Busy") {
                                                                                             bottomNavigationController.dialogForJoinInWaitList(context, searchController.astrologerList[index].name ?? "Astro", true, bottomNavigationController.astrologerbyId[0].callStatus.toString(), searchController.astrologerList[index].profileImage ?? "");
                                                                                           }
@@ -966,16 +985,27 @@ class SearchAstrologerScreen extends StatelessWidget {
                                                                                                 await bottomNavigationController.changeOfflineCallStatus(searchController.astrologerList[index].id, "Online");
                                                                                               }
                                                                                             }
-                                                                                            await Get.to(() => CallIntakeFormScreen(
-                                                                                                  astrologerProfile: searchController.astrologerList[index].profileImage ?? '',
-                                                                                                  type: "Videocall",
-                                                                                                  astrologerId: searchController.astrologerList[index].id!,
-                                                                                                  astrologerName: searchController.astrologerList[index].name ?? '',
-                                                                                                  isFreeAvailable: searchController.astrologerList[index].isFreeAvailable!,
-                                                                                                  rate: searchController.astrologerList[index].videoCallRate.toString(),
-                                                                                                ));
-
-                                                                                            global.hideLoader();
+                                                                                            // BYPASS INTAKE FORM - Send direct video call request
+                                                                                            print('📹 [SEARCH] Sending direct video call request to ${searchController.astrologerList[index].name}');
+                                                                                            
+                                                                                            try {
+                                                                                              CallController callController = Get.find<CallController>();
+                                                                                              await callController.sendDirectCallRequest(
+                                                                                                searchController.astrologerList[index].id!,
+                                                                                                searchController.astrologerList[index].name ?? '',
+                                                                                                "Videocall",
+                                                                                              );
+                                                                                              print('✅ [SEARCH] Video call request completed');
+                                                                                            } catch (e) {
+                                                                                              print('❌ [SEARCH] Video call error: ${e.toString()}');
+                                                                                              global.showToast(
+                                                                                                message: 'Failed to send video call request. Please try again.',
+                                                                                                textColor: global.textColor,
+                                                                                                bgColor: global.toastBackGoundColor,
+                                                                                              );
+                                                                                            } finally {
+                                                                                              global.hideLoader();
+                                                                                            }
                                                                                           } else if (searchController.astrologerList[index].callStatus == "Offline" || searchController.astrologerList[index].callStatus == "Busy" || searchController.astrologerList[index].callStatus == "Wait Time") {
                                                                                             bottomNavigationController.dialogForJoinInWaitList(context, searchController.astrologerList[index].name ?? "Astro", true, bottomNavigationController.astrologerbyId[0].callStatus.toString(), searchController.astrologerList[index].profileImage ?? "");
                                                                                           }

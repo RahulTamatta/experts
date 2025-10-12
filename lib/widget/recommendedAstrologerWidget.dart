@@ -1,9 +1,9 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:AstrowayCustomer/controllers/bottomNavigationController.dart';
+import 'package:AstrowayCustomer/controllers/callController.dart';
 import 'package:AstrowayCustomer/controllers/walletController.dart';
 import 'package:AstrowayCustomer/utils/images.dart';
-import 'package:AstrowayCustomer/views/callIntakeFormScreen.dart';
 import 'package:AstrowayCustomer/views/paymentInformationScreen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -143,15 +143,29 @@ class RecommendedAstrologerWidget extends StatelessWidget {
                                   double charge = double.parse(bottomNavigationController.astrologerList[index].charge.toString());
                                   if (charge * 5 <= global.splashController.currentUser!.walletAmount!) {
                                     global.showOnlyLoaderDialog(context);
-                                    await Get.to(() => CallIntakeFormScreen(
-                                          type: "Call",
-                                          astrologerId: bottomNavigationController.astrologerList[index].id!,
-                                          astrologerName: bottomNavigationController.astrologerList[index].name!,
-                                          astrologerProfile: bottomNavigationController.astrologerList[index].profileImage!,
-                                      rate:bottomNavigationController.astrologerList[index].charge.toString() ,
-                                        ));
-                                    Get.back();
-                                    global.hideLoader();
+                                    
+                                    // BYPASS INTAKE FORM - Send direct call request
+                                    print('📞 [RECOMMENDED WIDGET] Sending direct call request to ${bottomNavigationController.astrologerList[index].name}');
+                                    
+                                    try {
+                                      CallController callController = Get.find<CallController>();
+                                      await callController.sendDirectCallRequest(
+                                        bottomNavigationController.astrologerList[index].id!,
+                                        bottomNavigationController.astrologerList[index].name!,
+                                        "Call",
+                                      );
+                                      print('✅ [RECOMMENDED WIDGET] Call request completed');
+                                      Get.back();
+                                    } catch (e) {
+                                      print('❌ [RECOMMENDED WIDGET] Call error: ${e.toString()}');
+                                      global.showToast(
+                                        message: 'Failed to send call request. Please try again.',
+                                        textColor: global.textColor,
+                                        bgColor: global.toastBackGoundColor,
+                                      );
+                                    } finally {
+                                      global.hideLoader();
+                                    }
                                   } else {
                                     global.showOnlyLoaderDialog(context);
                                     await walletController.getAmount();

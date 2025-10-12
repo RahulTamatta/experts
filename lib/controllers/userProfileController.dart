@@ -72,16 +72,27 @@ class UserProfileController extends GetxController {
 
   getValue() async {
     if (splashController.currentUser != null) {
-      nameController.text = splashController.currentUser!.name!;
-      emailController.text = splashController.currentUser!.email!;
-      mobileController.text = splashController.currentUser!.contactNo!;
+      nameController.text = splashController.currentUser!.name ?? "";
+      emailController.text = splashController.currentUser!.email ?? "";
+      mobileController.text = splashController.currentUser!.contactNo ?? "";
       profile = splashController.currentUser!.profile ?? "";
-      updateGeneder(splashController.currentUser!.gender!);
-      dateController.text = formatDate(splashController.currentUser!.birthDate!, [dd, '-', mm, '-', yyyy]);
-      timeController.text = splashController.currentUser!.birthTime!;
-      placeBirthController.text = splashController.currentUser!.birthPlace!;
-      currentAddressController.text = splashController.currentUser!.addressLine1!;
-      addressController.text = splashController.currentUser!.location!;
+      
+      // Only update gender if it's not null
+      if (splashController.currentUser!.gender != null) {
+        updateGeneder(splashController.currentUser!.gender!);
+      }
+      
+      // Only format date if birthDate is not null
+      if (splashController.currentUser!.birthDate != null) {
+        dateController.text = formatDate(splashController.currentUser!.birthDate!, [dd, '-', mm, '-', yyyy]);
+      } else {
+        dateController.text = "";
+      }
+      
+      timeController.text = splashController.currentUser!.birthTime ?? "";
+      placeBirthController.text = splashController.currentUser!.birthPlace ?? "";
+      currentAddressController.text = splashController.currentUser!.addressLine1 ?? "";
+      addressController.text = splashController.currentUser!.location ?? "";
       pinController.text = splashController.currentUser!.pincode.toString() == "null" ? "" : splashController.currentUser!.pincode.toString();
       imageFile = null;
       userFile = null;

@@ -12,7 +12,7 @@ import 'package:AstrowayCustomer/utils/AppColors.dart';
 import 'package:AstrowayCustomer/utils/images.dart';
 import 'package:AstrowayCustomer/views/addMoneyToWallet.dart';
 import 'package:AstrowayCustomer/views/call/incoming_call_request.dart';
-import 'package:AstrowayCustomer/views/callIntakeFormScreen.dart';
+// REMOVED: CallIntakeFormScreen - Direct call without intake form
 import 'package:AstrowayCustomer/views/paymentInformationScreen.dart';
 import 'package:AstrowayCustomer/views/searchAstrologerScreen.dart';
 import 'package:AstrowayCustomer/widget/customAppbarWidget.dart';
@@ -1423,37 +1423,58 @@ class _TabViewAstrologerState extends State<TabViewAstrologer> {
   void _logedIn(context, isLogin, index, audio, dynamic charge) async {
     if (isLogin) {
       //_checkAstrologerAvailability(index);
+      String callType = audio ? "Call" : "Videocall";
+      print('📞 [CALL BUTTON] Clicked for ${widget.astrologerList[index].name}');
+      print('📞 [CALL BUTTON] Astrologer ID: ${widget.astrologerList[index].id}');
+      print('📞 [CALL BUTTON] Call Type: $callType');
+      print('📞 [CALL BUTTON] Call Status: ${widget.astrologerList[index].callStatus}');
+      
       await bottomNavigationController
           .getAstrologerbyId(widget.astrologerList[index].id);
-      // WHATSAPP-LIKE FREE COMMUNICATION - Wallet check removed
+      // WHATSAPP-LIKE FREE COMMUNICATION - Direct call without intake form
       // All users can make calls without balance requirements
       await bottomNavigationController
           .checkAlreadyInReqForCall(widget.astrologerList[index].id);
+          
+      print('📞 [CALL BUTTON] Already in request: ${bottomNavigationController.isUserAlreadyInCallReq}');
+      
       if (bottomNavigationController.isUserAlreadyInCallReq == false) {
           if (widget.astrologerList[index].callStatus == "Online") {
+            print('📞 [CALL BUTTON] Astrologer is Online - Sending direct $callType request');
             global.showOnlyLoaderDialog(context);
-            if (widget.astrologerList[index].callWaitTime != null) {
-              if (widget.astrologerList[index]
-                      .callWaitTime!
-                      .difference(DateTime.now())
-                      .inMinutes <
-                  0) {
-                await bottomNavigationController.changeOfflineCallStatus(
-                    widget.astrologerList[index].id, "Online");
+            
+            try {
+              if (widget.astrologerList[index].callWaitTime != null) {
+                if (widget.astrologerList[index]
+                        .callWaitTime!
+                        .difference(DateTime.now())
+                        .inMinutes <
+                    0) {
+                  await bottomNavigationController.changeOfflineCallStatus(
+                      widget.astrologerList[index].id, "Online");
+                }
               }
-            }
-            await Get.to(() => CallIntakeFormScreen(
-                  astrologerProfile: widget.astrologerList[index].profileImage,
-                  type: audio ? "Call" : "Videocall",
-                  astrologerId: widget.astrologerList[index].id,
-                  astrologerName: widget.astrologerList[index].name,
-                  isFreeAvailable: widget.astrologerList[index].isFreeAvailable,
-                  rate: audio
-                      ? widget.astrologerList[index].charge.toString()
-                      : widget.astrologerList[index].videoCallRate.toString(),
-                ));
+              
+              // BYPASS INTAKE FORM - Send direct call request
+              CallController callController = Get.find<CallController>();
+              await callController.sendDirectCallRequest(
+                widget.astrologerList[index].id,
+                widget.astrologerList[index].name,
+                callType,
+              );
 
-            global.hideLoader();
+              print('📞 [CALL BUTTON] Direct $callType request completed');
+            } catch (e) {
+              print('❌ [CALL BUTTON] Error: ${e.toString()}');
+              global.showToast(
+                message: 'Failed to send $callType request. Please check your connection.',
+                textColor: global.textColor,
+                bgColor: global.toastBackGoundColor,
+              );
+            } finally {
+              // ALWAYS hide loader, even if error occurs
+              global.hideLoader();
+            }
           } else if (widget.astrologerList[index].callStatus == "Offline" ||
               widget.astrologerList[index].callStatus == "Busy" ||
               widget.astrologerList[index].callStatus == "Wait Time") {

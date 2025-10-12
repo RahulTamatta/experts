@@ -262,25 +262,96 @@ class ChatController extends GetxController
 
   sendChatRequest(int astrologerId, bool isFreeSession, String time) async {
     try {
-      await apiHelper
-          .sendAstrologerChatRequest(astrologerId, isFreeSession, time)
-          .then((result) {
-        if (result.status == "200") {
-          global.showToast(
-            message: 'Sending chat request..',
-            textColor: global.textColor,
-            bgColor: global.toastBackGoundColor,
-          );
-        } else {
-          global.showToast(
-            message: 'Failed to send chat request',
-            textColor: global.textColor,
-            bgColor: global.toastBackGoundColor,
-          );
-        }
-      });
+      final result = await apiHelper.sendAstrologerChatRequest(astrologerId, isFreeSession, time);
+      
+      if (result == null) {
+        print('❌ [CHAT REQUEST] API returned null');
+        global.showToast(
+          message: 'Network error. Please try again.',
+          textColor: global.textColor,
+          bgColor: global.toastBackGoundColor,
+        );
+        return;
+      }
+      
+      print('📡 [CHAT REQUEST] Status: ${result.status}');
+      
+      if (result.status == "200") {
+        print('✅ [CHAT REQUEST] Request sent successfully');
+        global.showToast(
+          message: 'Chat request sent successfully',
+          textColor: global.textColor,
+          bgColor: global.toastBackGoundColor,
+        );
+      } else if (result.status == "409") {
+        // Duplicate request
+        print('⚠️ [CHAT REQUEST] Duplicate request detected');
+        global.showToast(
+          message: 'You already have a pending request with this astrologer',
+          textColor: global.textColor,
+          bgColor: global.toastBackGoundColor,
+        );
+      } else if (result.status == "503") {
+        // Astrologer busy/offline
+        print('⚠️ [CHAT REQUEST] Astrologer unavailable');
+        global.showToast(
+          message: result.message ?? 'Astrologer is currently unavailable',
+          textColor: global.textColor,
+          bgColor: global.toastBackGoundColor,
+        );
+      } else {
+        print('❌ [CHAT REQUEST] Failed with status: ${result.status}');
+        global.showToast(
+          message: result.message ?? 'Failed to send chat request',
+          textColor: global.textColor,
+          bgColor: global.toastBackGoundColor,
+        );
+      }
     } catch (e) {
-      print('Exception in sendCallRequest : - ${e.toString()}');
+      print('❌ [CHAT REQUEST] Exception: ${e.toString()}');
+      global.showToast(
+        message: 'Failed to send chat request. Please try again.',
+        textColor: global.textColor,
+        bgColor: global.toastBackGoundColor,
+      );
+    }
+  }
+
+  // WHATSAPP-LIKE FREE COMMUNICATION - Direct chat without intake form
+  Future<void> sendDirectChatRequest(int astrologerId, String astrologerName) async {
+    try {
+      print('🚀 [FREE CHAT] Starting direct chat request');
+      print('🚀 [FREE CHAT] Astrologer ID: $astrologerId');
+      print('🚀 [FREE CHAT] Astrologer Name: $astrologerName');
+      print('🚀 [FREE CHAT] User ID: ${global.currentUserId}');
+      
+      // Send initial greeting message
+      await sendMessage(
+        'Hi $astrologerName, I would like to chat with you.',
+        '${astrologerId}_${global.currentUserId}',
+        astrologerId,
+        false,
+      );
+      
+      print('🚀 [FREE CHAT] Initial message sent');
+      
+      // Send chat request with free session (no time limit)
+      await sendChatRequest(astrologerId, true, '999999');
+      
+      print('🚀 [FREE CHAT] Chat request sent successfully');
+      
+      global.showToast(
+        message: 'Chat request sent to $astrologerName',
+        textColor: global.textColor,
+        bgColor: global.toastBackGoundColor,
+      );
+    } catch (e) {
+      print('❌ [FREE CHAT] Exception: ${e.toString()}');
+      global.showToast(
+        message: 'Failed to send chat request',
+        textColor: global.textColor,
+        bgColor: global.toastBackGoundColor,
+      );
     }
   }
 

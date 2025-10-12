@@ -34,7 +34,6 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../utils/images.dart';
-import '../callIntakeFormScreen.dart';
 
 class AstrologerProfile extends StatefulWidget {
   final int index;
@@ -1016,30 +1015,26 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                                                 }
                                               }
 
-                                              await Get.to(() => CallIntakeFormScreen(
-                                                  type: "Chat",
-                                                  astrologerId:
-                                                      bottomNavigationController
-                                                          .astrologerbyId[0]
-                                                          .id!,
-                                                  astrologerName:
-                                                      bottomNavigationController
-                                                          .astrologerbyId[0]
-                                                          .name!,
-                                                  astrologerProfile:
-                                                      bottomNavigationController
-                                                          .astrologerbyId[0]
-                                                          .profileImage!,
-                                                  isFreeAvailable:
-                                                      bottomNavigationController
-                                                          .astrologerbyId[0]
-                                                          .isFreeAvailable!,
-                                                  rate:
-                                                      bottomNavigationController
-                                                          .astrologerbyId[0]
-                                                          .charge!
-                                                          .toString()));
-                                              global.hideLoader();
+                                              // BYPASS INTAKE FORM - Send direct chat request
+                                              print('🎯 [ASTROLOGER PROFILE] Sending direct chat request to ${bottomNavigationController.astrologerbyId[0].name}');
+                                              
+                                              try {
+                                                ChatController chatController = Get.find<ChatController>();
+                                                await chatController.sendDirectChatRequest(
+                                                  bottomNavigationController.astrologerbyId[0].id!,
+                                                  bottomNavigationController.astrologerbyId[0].name!,
+                                                );
+                                                print('✅ [ASTROLOGER PROFILE] Chat request completed');
+                                              } catch (e) {
+                                                print('❌ [ASTROLOGER PROFILE] Chat error: ${e.toString()}');
+                                                global.showToast(
+                                                  message: 'Failed to send chat request. Please try again.',
+                                                  textColor: global.textColor,
+                                                  bgColor: global.toastBackGoundColor,
+                                                );
+                                              } finally {
+                                                global.hideLoader();
+                                              }
                                             } else {
                                               bottomNavigationController
                                                   .dialogForNotCreatingSession(
@@ -1144,30 +1139,27 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                                                           "Online");
                                                 }
                                               }
-                                              await Get.to(() => CallIntakeFormScreen(
-                                                  astrologerProfile:
-                                                      bottomNavigationController
-                                                          .astrologerbyId[0]
-                                                          .profileImage!,
-                                                  type: "Call",
-                                                  astrologerId:
-                                                      bottomNavigationController
-                                                          .astrologerbyId[0]
-                                                          .id!,
-                                                  astrologerName:
-                                                      bottomNavigationController
-                                                          .astrologerbyId[0]
-                                                          .name!,
-                                                  isFreeAvailable:
-                                                      bottomNavigationController
-                                                          .astrologerbyId[0]
-                                                          .isFreeAvailable,
-                                                  rate:
-                                                      bottomNavigationController
-                                                          .astrologerbyId[0]
-                                                          .charge
-                                                          .toString()));
-                                              global.hideLoader();
+                                              // BYPASS INTAKE FORM - Send direct call request
+                                              print('📞 [ASTROLOGER PROFILE] Sending direct call request to ${bottomNavigationController.astrologerbyId[0].name}');
+                                              
+                                              try {
+                                                CallController callController = Get.find<CallController>();
+                                                await callController.sendDirectCallRequest(
+                                                  bottomNavigationController.astrologerbyId[0].id!,
+                                                  bottomNavigationController.astrologerbyId[0].name!,
+                                                  "Call",
+                                                );
+                                                print('✅ [ASTROLOGER PROFILE] Call request completed');
+                                              } catch (e) {
+                                                print('❌ [ASTROLOGER PROFILE] Call error: ${e.toString()}');
+                                                global.showToast(
+                                                  message: 'Failed to send call request. Please try again.',
+                                                  textColor: global.textColor,
+                                                  bgColor: global.toastBackGoundColor,
+                                                );
+                                              } finally {
+                                                global.hideLoader();
+                                              }
                                             } else {
                                               bottomNavigationController
                                                   .dialogForNotCreatingSession(
@@ -2365,27 +2357,26 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                                     }
                                   }
 
-                                  await Get.to(() => CallIntakeFormScreen(
-                                        type: "Chat",
-                                        astrologerId: bottomNavigationController
-                                            .astrologerbyId[0].id!,
-                                        astrologerName:
-                                            bottomNavigationController
-                                                .astrologerbyId[0].name!,
-                                        astrologerProfile:
-                                            bottomNavigationController
-                                                .astrologerbyId[0]
-                                                .profileImage!,
-                                        isFreeAvailable:
-                                            bottomNavigationController
-                                                .astrologerbyId[0]
-                                                .isFreeAvailable,
-                                        rate: bottomNavigationController
-                                            .astrologerbyId[0].charge
-                                            .toString(),
-                                        //index: index,
-                                      ));
-                                  global.hideLoader();
+                                  // BYPASS INTAKE FORM - Send direct chat request
+                                  print('🎯 [ASTROLOGER PROFILE TAB] Sending direct chat request to ${bottomNavigationController.astrologerbyId[0].name}');
+                                  
+                                  try {
+                                    ChatController chatController = Get.find<ChatController>();
+                                    await chatController.sendDirectChatRequest(
+                                      bottomNavigationController.astrologerbyId[0].id!,
+                                      bottomNavigationController.astrologerbyId[0].name!,
+                                    );
+                                    print('✅ [ASTROLOGER PROFILE TAB] Chat request completed');
+                                  } catch (e) {
+                                    print('❌ [ASTROLOGER PROFILE TAB] Chat error: ${e.toString()}');
+                                    global.showToast(
+                                      message: 'Failed to send chat request. Please try again.',
+                                      textColor: global.textColor,
+                                      bgColor: global.toastBackGoundColor,
+                                    );
+                                  } finally {
+                                    global.hideLoader();
+                                  }
                                 } else {
                                   bottomNavigationController
                                       .dialogForNotCreatingSession(context);
@@ -2556,27 +2547,27 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                                               "Online");
                                     }
                                   }
-                                  await Get.to(() => CallIntakeFormScreen(
-                                        astrologerProfile:
-                                            bottomNavigationController
-                                                .astrologerbyId[0]
-                                                .profileImage!,
-                                        type: "Call",
-                                        astrologerId: bottomNavigationController
-                                            .astrologerbyId[0].id!,
-                                        astrologerName:
-                                            bottomNavigationController
-                                                .astrologerbyId[0].name!,
-                                        isFreeAvailable:
-                                            bottomNavigationController
-                                                .astrologerbyId[0]
-                                                .isFreeAvailable,
-                                        rate: bottomNavigationController
-                                            .astrologerbyId[0].charge
-                                            .toString(),
-                                      ));
-
-                                  global.hideLoader();
+                                  // BYPASS INTAKE FORM - Send direct call request
+                                  print('📞 [ASTROLOGER PROFILE TAB] Sending direct call request to ${bottomNavigationController.astrologerbyId[0].name}');
+                                  
+                                  try {
+                                    CallController callController = Get.find<CallController>();
+                                    await callController.sendDirectCallRequest(
+                                      bottomNavigationController.astrologerbyId[0].id!,
+                                      bottomNavigationController.astrologerbyId[0].name!,
+                                      "Call",
+                                    );
+                                    print('✅ [ASTROLOGER PROFILE TAB] Call request completed');
+                                  } catch (e) {
+                                    print('❌ [ASTROLOGER PROFILE TAB] Call error: ${e.toString()}');
+                                    global.showToast(
+                                      message: 'Failed to send call request. Please try again.',
+                                      textColor: global.textColor,
+                                      bgColor: global.toastBackGoundColor,
+                                    );
+                                  } finally {
+                                    global.hideLoader();
+                                  }
                                 } else {
                                   bottomNavigationController
                                       .dialogForNotCreatingSession(context);
@@ -2741,27 +2732,27 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                                               "Online");
                                     }
                                   }
-                                  await Get.to(() => CallIntakeFormScreen(
-                                        astrologerProfile:
-                                            bottomNavigationController
-                                                .astrologerbyId[0]
-                                                .profileImage!,
-                                        type: "Videocall",
-                                        astrologerId: bottomNavigationController
-                                            .astrologerbyId[0].id!,
-                                        astrologerName:
-                                            bottomNavigationController
-                                                .astrologerbyId[0].name!,
-                                        isFreeAvailable:
-                                            bottomNavigationController
-                                                .astrologerbyId[0]
-                                                .isFreeAvailable,
-                                        rate: bottomNavigationController
-                                            .astrologerbyId[0].videoCallRate
-                                            .toString(),
-                                      ));
-
-                                  global.hideLoader();
+                                  // BYPASS INTAKE FORM - Send direct video call request
+                                  print('📹 [ASTROLOGER PROFILE TAB] Sending direct video call request to ${bottomNavigationController.astrologerbyId[0].name}');
+                                  
+                                  try {
+                                    CallController callController = Get.find<CallController>();
+                                    await callController.sendDirectCallRequest(
+                                      bottomNavigationController.astrologerbyId[0].id!,
+                                      bottomNavigationController.astrologerbyId[0].name!,
+                                      "Videocall",
+                                    );
+                                    print('✅ [ASTROLOGER PROFILE TAB] Video call request completed');
+                                  } catch (e) {
+                                    print('❌ [ASTROLOGER PROFILE TAB] Video call error: ${e.toString()}');
+                                    global.showToast(
+                                      message: 'Failed to send video call request. Please try again.',
+                                      textColor: global.textColor,
+                                      bgColor: global.toastBackGoundColor,
+                                    );
+                                  } finally {
+                                    global.hideLoader();
+                                  }
                                 } else {
                                   bottomNavigationController
                                       .dialogForNotCreatingSession(context);

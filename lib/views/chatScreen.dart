@@ -13,7 +13,7 @@ import 'package:AstrowayCustomer/utils/AppColors.dart';
 import 'package:AstrowayCustomer/utils/images.dart';
 import 'package:AstrowayCustomer/views/addMoneyToWallet.dart';
 import 'package:AstrowayCustomer/views/astrologerProfile/astrologerProfile.dart';
-import 'package:AstrowayCustomer/views/callIntakeFormScreen.dart';
+// REMOVED: CallIntakeFormScreen - Direct chat without intake form
 import 'package:AstrowayCustomer/views/chat/incoming_chat_request.dart';
 import 'package:AstrowayCustomer/views/paymentInformationScreen.dart';
 import 'package:AstrowayCustomer/views/searchAstrologerScreen.dart';
@@ -1092,51 +1092,63 @@ class _TabViewWidgetState extends State<TabViewWidget> {
                                 await bottomNavigationController
                                     .getAstrologerbyId(
                                         widget.astrologerList[index].id);
-                                // WHATSAPP-LIKE FREE COMMUNICATION - Wallet check removed
+                                // WHATSAPP-LIKE FREE COMMUNICATION - Direct chat without intake form
                                 // All users can chat without balance requirements
+                                print('🎯 [CHAT BUTTON] Clicked for ${widget.astrologerList[index].name}');
+                                print('🎯 [CHAT BUTTON] Astrologer ID: ${widget.astrologerList[index].id}');
+                                print('🎯 [CHAT BUTTON] Chat Status: ${widget.astrologerList[index].chatStatus}');
+                                
                                 await bottomNavigationController
                                     .checkAlreadyInReq(
                                         widget.astrologerList[index].id);
+                                        
+                                print('🎯 [CHAT BUTTON] Already in request: ${bottomNavigationController.isUserAlreadyInChatReq}');
+                                
                                 if (bottomNavigationController
                                         .isUserAlreadyInChatReq ==
                                     false) {
                                     if (widget
                                             .astrologerList[index].chatStatus ==
                                         "Online") {
+                                      print('🎯 [CHAT BUTTON] Astrologer is Online - Sending direct chat request');
                                       global.showOnlyLoaderDialog(context);
 
-                                      if (widget.astrologerList[index]
-                                              .chatWaitTime !=
-                                          null) {
+                                      try {
                                         if (widget.astrologerList[index]
-                                                .chatWaitTime!
-                                                .difference(DateTime.now())
-                                                .inMinutes <
-                                            0) {
-                                          await bottomNavigationController
-                                              .changeOfflineStatus(
-                                                  widget
-                                                      .astrologerList[index].id,
-                                                  "Online");
+                                                .chatWaitTime !=
+                                            null) {
+                                          if (widget.astrologerList[index]
+                                                  .chatWaitTime!
+                                                  .difference(DateTime.now())
+                                                  .inMinutes <
+                                              0) {
+                                            await bottomNavigationController
+                                                .changeOfflineStatus(
+                                                    widget
+                                                        .astrologerList[index].id,
+                                                    "Online");
+                                          }
                                         }
+                                        
+                                        // BYPASS INTAKE FORM - Send direct chat request
+                                        ChatController chatController = Get.find<ChatController>();
+                                        await chatController.sendDirectChatRequest(
+                                          widget.astrologerList[index].id,
+                                          widget.astrologerList[index].name,
+                                        );
+                                        
+                                        print('🎯 [CHAT BUTTON] Direct chat request completed');
+                                      } catch (e) {
+                                        print('❌ [CHAT BUTTON] Error: ${e.toString()}');
+                                        global.showToast(
+                                          message: 'Failed to send chat request. Please check your connection.',
+                                          textColor: global.textColor,
+                                          bgColor: global.toastBackGoundColor,
+                                        );
+                                      } finally {
+                                        // ALWAYS hide loader, even if error occurs
+                                        global.hideLoader();
                                       }
-                                      await Get.to(() => CallIntakeFormScreen(
-                                            type: "Chat",
-                                            astrologerId:
-                                                widget.astrologerList[index].id,
-                                            astrologerName: widget
-                                                .astrologerList[index].name,
-                                            astrologerProfile: widget
-                                                .astrologerList[index]
-                                                .profileImage,
-                                            isFreeAvailable: widget
-                                                .astrologerList[index]
-                                                .isFreeAvailable,
-                                            rate: widget
-                                                .astrologerList[index].charge
-                                                .toString(),
-                                          ));
-                                      global.hideLoader();
                                     } else if (widget.astrologerList[index]
                                                 .chatStatus ==
                                             "Offline" ||

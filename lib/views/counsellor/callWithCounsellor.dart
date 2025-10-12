@@ -9,14 +9,13 @@ import 'package:get/get.dart';
 
 
 import '../../controllers/bottomNavigationController.dart';
-
+import '../../controllers/callController.dart';
 import '../../controllers/reviewController.dart';
 import '../../controllers/walletController.dart';
 import '../../utils/images.dart';
 import 'package:AstrowayCustomer/utils/global.dart' as global;
 
 import '../astrologerProfile/astrologerProfile.dart';
-import '../callIntakeFormScreen.dart';
 import '../paymentInformationScreen.dart';
 
 // ignore: must_be_immutable
@@ -175,15 +174,28 @@ class CallWithCounsellors extends StatelessWidget {
                                   double charge = double.parse(counsellorController.counsellorList[index].charge.toString());
                                   if (charge * 5 <= global.splashController.currentUser!.walletAmount!) {
                                     global.showOnlyLoaderDialog(context);
-                                    await Get.to(() => CallIntakeFormScreen(
-                                          type: "Call",
-                                          astrologerId: counsellorController.counsellorList[index].id,
-                                          astrologerName: counsellorController.counsellorList[index].name,
-                                          astrologerProfile: counsellorController.counsellorList[index].profileImage ?? "",
-                                      rate:counsellorController.counsellorList[index].charge.toString() ,
-                                        ));
-
-                                    global.hideLoader();
+                                    
+                                    // BYPASS INTAKE FORM - Send direct call request to counsellor
+                                    print('📞 [COUNSELLOR CALL] Sending direct call request to ${counsellorController.counsellorList[index].name}');
+                                    
+                                    try {
+                                      CallController callController = Get.find<CallController>();
+                                      await callController.sendDirectCallRequest(
+                                        counsellorController.counsellorList[index].id,
+                                        counsellorController.counsellorList[index].name,
+                                        "Call",
+                                      );
+                                      print('✅ [COUNSELLOR CALL] Call request completed');
+                                    } catch (e) {
+                                      print('❌ [COUNSELLOR CALL] Call error: ${e.toString()}');
+                                      global.showToast(
+                                        message: 'Failed to send call request. Please try again.',
+                                        textColor: global.textColor,
+                                        bgColor: global.toastBackGoundColor,
+                                      );
+                                    } finally {
+                                      global.hideLoader();
+                                    }
                                   } else {
                                     global.showOnlyLoaderDialog(context);
                                     await walletController.getAmount();
