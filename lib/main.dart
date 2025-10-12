@@ -43,6 +43,8 @@ import 'package:http/http.dart' as http;
 import 'controllers/timer_controller.dart';
 
 final _localNotifications = FlutterLocalNotificationsPlugin();
+final AudioPlayer player = AudioPlayer();
+
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("_firebaseMessagingBackgroundHandler a background message: ${message.messageId}");
@@ -627,6 +629,14 @@ class _MyAppState extends State<MyApp> {
                               )
                             ],
                           ),
+                        ),
+                        actionsAlignment: MainAxisAlignment.spaceBetween,
+                        actionsPadding: const EdgeInsets.only(
+                            bottom: 15, left: 15, right: 15),
+                      );
+                    });
+                */
+                // End of old commented dialog code
               } else if (messageData['notificationType'] == 1) {
                 //! calling code
 
@@ -1012,7 +1022,7 @@ Future<String> _downloadAndSaveFile(String url, String fileName) async {
   return filePath;
 }
 
-AudioPlayer player = new AudioPlayer();
+// AudioPlayer player already declared at top of file
 Future<void> onSelectNotification(String payload) async {
   global.sp = await SharedPreferences.getInstance();
   if (global.sp!.getString("currentUser") != null) {
