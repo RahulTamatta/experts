@@ -1561,17 +1561,10 @@ class _AcceptChatScreenState extends State<AcceptChatScreen> {
                                   // );
                                 },
                                 onEnd: () async {
-                                  log('in onEnd chat:- ${chatController.isEndChat} :- controller_seconds ${timerController.totalSeconds}');
-                                  log('in onEnd widget_pass_second:- ${timerController.totalSeconds}');
-
-                                  if (chatController.isTimerEnded ==
-                                      false) {
-                                    openDialogRecharge(
-                                        context, chatController);
-                                  } else {
-                                    debugPrint(
-                                        'dialog alreayd exited');
-                                  }
+                                  // WHATSAPP-LIKE FREE COMMUNICATION - No timer-based auto-end
+                                  // Users can chat as long as they want without time restrictions
+                                  log('Timer ended but no action taken - unlimited chat duration');
+                                  // Removed: openDialogRecharge() - No recharge prompts
                                 },
                               )
                                   : SizedBox()),

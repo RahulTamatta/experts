@@ -1425,12 +1425,11 @@ class _TabViewAstrologerState extends State<TabViewAstrologer> {
       //_checkAstrologerAvailability(index);
       await bottomNavigationController
           .getAstrologerbyId(widget.astrologerList[index].id);
-      print('charge${charge}');
-      if (charge * 5 <= global.splashController.currentUser!.walletAmount! ||
-          widget.astrologerList[index].isFreeAvailable == true) {
-        await bottomNavigationController
-            .checkAlreadyInReqForCall(widget.astrologerList[index].id);
-        if (bottomNavigationController.isUserAlreadyInCallReq == false) {
+      // WHATSAPP-LIKE FREE COMMUNICATION - Wallet check removed
+      // All users can make calls without balance requirements
+      await bottomNavigationController
+          .checkAlreadyInReqForCall(widget.astrologerList[index].id);
+      if (bottomNavigationController.isUserAlreadyInCallReq == false) {
           if (widget.astrologerList[index].callStatus == "Online") {
             global.showOnlyLoaderDialog(context);
             if (widget.astrologerList[index].callWaitTime != null) {
@@ -1469,13 +1468,7 @@ class _TabViewAstrologerState extends State<TabViewAstrologer> {
         } else {
           bottomNavigationController.dialogForNotCreatingSession(context);
         }
-      } else {
-        global.showOnlyLoaderDialog(context);
-        await walletController.getAmount();
-        global.hideLoader();
-        openBottomSheetRechrage(
-            context, (charge * 5).toString(), '${widget.astrologerList[index].name}');
-      }
+      // Removed wallet recharge prompt - All calls are FREE
     }
   }
 }

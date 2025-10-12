@@ -1092,18 +1092,14 @@ class _TabViewWidgetState extends State<TabViewWidget> {
                                 await bottomNavigationController
                                     .getAstrologerbyId(
                                         widget.astrologerList[index].id);
-                                if (widget.astrologerList[index].charge * 5 <=
-                                        global.splashController.currentUser!
-                                            .walletAmount ||
-                                    widget.astrologerList[index]
-                                            .isFreeAvailable ==
-                                        true) {
-                                  await bottomNavigationController
-                                      .checkAlreadyInReq(
-                                          widget.astrologerList[index].id);
-                                  if (bottomNavigationController
-                                          .isUserAlreadyInChatReq ==
-                                      false) {
+                                // WHATSAPP-LIKE FREE COMMUNICATION - Wallet check removed
+                                // All users can chat without balance requirements
+                                await bottomNavigationController
+                                    .checkAlreadyInReq(
+                                        widget.astrologerList[index].id);
+                                if (bottomNavigationController
+                                        .isUserAlreadyInChatReq ==
+                                    false) {
                                     if (widget
                                             .astrologerList[index].chatStatus ==
                                         "Online") {
@@ -1165,16 +1161,7 @@ class _TabViewWidgetState extends State<TabViewWidget> {
                                     bottomNavigationController
                                         .dialogForNotCreatingSession(context);
                                   }
-                                } else {
-                                  global.showOnlyLoaderDialog(context);
-                                  await walletController.getAmount();
-                                  global.hideLoader();
-                                  openBottomSheetRechrage(
-                                      context,
-                                      (widget.astrologerList[index].charge * 5)
-                                          .toString(),
-                                      widget.astrologerList[index].name);
-                                }
+                                // Removed wallet recharge prompt - All chats are FREE
                               }
                             },
                             child: widget.astrologerList[index]

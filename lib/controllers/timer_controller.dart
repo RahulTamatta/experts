@@ -34,8 +34,9 @@ class TimerController extends GetxController {
     try {
       await apiHelper.saveChattingTime(seconds, chatIdd).then((result) {
         if (result.status == "200") {
-          global.splashController.currentUser?.walletAmount = result.recordList;
-
+          // WHATSAPP-LIKE FREE COMMUNICATION - No wallet deduction
+          // Backend returns 0 charges, no need to update wallet amount
+          
           global.showToast(
             message: 'Chat ended..',
             textColor: global.textColor,
@@ -49,11 +50,6 @@ class TimerController extends GetxController {
           );
         }
       });
-      // await global.checkBody().then((result) async {
-      //   if (result) {
-      //
-      //   }
-      // });
     } catch (e) {
       print('Exception in endCallRequest : - ${e.toString()}');
     }

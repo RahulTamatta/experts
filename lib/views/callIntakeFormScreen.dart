@@ -650,13 +650,10 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
       bottomSheet: GetBuilder<IntakeController>(builder: (intakeController) {
         return CustomBottomButton(
           onTap: () async {
-            double charge = double.parse(widget.rate.toString());
-            //double totalMin=int.parse(global.splashController.currentUser!.walletAmount.toString().split(".").first)/int.parse(charge.toString().split(".").first);
-            if (charge * time[selectTime] <=
-                    global.splashController.currentUser!.walletAmount! ||
-                bottomNavigationController.astrologerbyId[0].isFreeAvailable ==
-                    true) {
-              bool isvalid = intakeController.isValidData();
+            // WHATSAPP-LIKE FREE COMMUNICATION - All wallet checks removed
+            // Users can initiate calls/chats without any balance requirements
+            
+            bool isvalid = intakeController.isValidData();
               print(isvalid);
               if (!isvalid) {
                 global.showToast(
@@ -773,18 +770,7 @@ class _CallIntakeFormScreenState extends State<CallIntakeFormScreen> {
                   );
                 }
               }
-            } else {
-              log("ajksndkjnaskjndk");
-              global.showOnlyLoaderDialog(context);
-              await walletController.getAmount();
-              global.hideLoader();
-              openBottomSheetRechrage(
-                  context,
-                  (charge * time[selectTime]).toString(),
-                  '${widget.type}',
-                  '${bottomNavigationController.astrologerbyId[0].name}',
-                  time[selectTime].toString());
-            }
+            // Removed wallet balance check and recharge prompt - All sessions are FREE
           },
           title:
               '${tr("Start")} ${widget.type} ${tr("with")} ${widget.astrologerName}',

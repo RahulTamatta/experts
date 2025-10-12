@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "11780657341-g9daa12s8qs3tsase0eocjgchnc4mvj5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nexora.fittalk",
+            "certificate_hash": "5f97672ac259ac73361ee3c3c5235e7bf1092f5d"
+          }
+        },
+        {
           "client_id": "11780657341-p7sernch3nlq7r992g2opnafn5g9snrs.apps.googleusercontent.com",
           "client_type": 3
         }

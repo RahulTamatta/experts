@@ -360,26 +360,28 @@ class IntakeController extends GetxController {
 
   checkFreeSessionAvailable() async {
     try {
+      // WHATSAPP-LIKE FREE COMMUNICATION - All sessions are free
+      // Backend always returns true, unlimited sessions allowed
       await global.checkBody().then((result) async {
         if (result) {
           await apiHelper.checkFreeSession().then((result) {
             if (result.status == "200") {
-              isAddNewRequestByFreeuser = result.recordList ?? false;
+              // Backend now always returns true for free sessions
+              isAddNewRequestByFreeuser = result.recordList ?? true;
               update();
             } else {
-              if (global.currentUserId != null) {
-                global.showToast(
-                  message: 'Free session not granted!',
-                  textColor: global.textColor,
-                  bgColor: global.toastBackGoundColor,
-                );
-              }
+              // Even if API fails, allow session (failsafe for free communication)
+              isAddNewRequestByFreeuser = true;
+              update();
             }
           });
         }
       });
     } catch (e) {
       print('Exception in checkFreeSessionAvailable():' + e.toString());
+      // Failsafe: Allow session even on exception
+      isAddNewRequestByFreeuser = true;
+      update();
     }
   }
 }
