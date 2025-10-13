@@ -3241,4 +3241,67 @@ class APIHelper {
       debugPrint("Exception in addFeedBack : -" + e.toString());
     }
   }
+
+  // 🚀 WHATSAPP-LIKE: Notify expert of chat start (instant, no request)
+  Future<Map<String, dynamic>?> notifyChatStart(int astrologerId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/notifyChatStart'),
+        headers: await global.getApiHeaders(true),
+        body: json.encode({"astrologerId": astrologerId}),
+      );
+      debugPrint('🚀 [CUSTOMER] Chat notification sent: ${response.body}');
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+      return null;
+    } catch (e) {
+      debugPrint('❌ Exception in notifyChatStart: $e');
+      return null;
+    }
+  }
+
+  // 🚀 WHATSAPP-LIKE: Notify expert of call start (instant, no request)
+  Future<Map<String, dynamic>?> notifyCallStart(int astrologerId, String callType) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/notifyCallStart'),
+        headers: await global.getApiHeaders(true),
+        body: json.encode({
+          "astrologerId": astrologerId,
+          "call_type": callType,
+        }),
+      );
+      debugPrint('🚀 [CUSTOMER] Call notification sent: ${response.body}');
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+      return null;
+    } catch (e) {
+      debugPrint('❌ Exception in notifyCallStart: $e');
+      return null;
+    }
+  }
+
+  // 🚀 WHATSAPP-LIKE: Generate Agora token
+  Future<Map<String, dynamic>?> generateAgoraToken(String channelName, int userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/generateAgoraToken'),
+        headers: await global.getApiHeaders(true),
+        body: json.encode({
+          "channelName": channelName,
+          "userId": userId,
+        }),
+      );
+      debugPrint('🚀 [CUSTOMER] Agora token generated: ${response.body}');
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+      return null;
+    } catch (e) {
+      debugPrint('❌ Exception in generateAgoraToken: $e');
+      return null;
+    }
+  }
 }

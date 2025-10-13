@@ -832,7 +832,8 @@ class BottomNavigationController extends GetxController {
     }
   }
 
-  Future<dynamic> getAstrologerbyId(int astrologerId) async {
+  // ✅ WHATSAPP-LIKE: Always fetch fresh status (no caching)
+  Future<dynamic> getAstrologerbyId(int astrologerId, {bool forceRefresh = false}) async {
     try {
       await global.checkBody().then((result) async {
         if (result) {
@@ -841,9 +842,7 @@ class BottomNavigationController extends GetxController {
               .then((result) {
             if (result.status == "200") {
               astrologerbyId = result.recordList;
-              print("astrologer id");
-              print("${astrologerbyId[0].id}");
-              // homeController.getAstroStory();
+              print("✅ [CUSTOMER] Astrologer status refreshed: ${astrologerbyId.isNotEmpty ? astrologerbyId[0].chatStatus : 'N/A'}");
               update();
             } else {
               global.showToast(

@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable, deprecated_member_use
 
+import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
@@ -7,6 +8,7 @@ import 'package:AstrowayCustomer/controllers/astrologer_assistant_controller.dar
 import 'package:AstrowayCustomer/controllers/bottomNavigationController.dart';
 import 'package:AstrowayCustomer/controllers/callController.dart';
 import 'package:AstrowayCustomer/controllers/chatController.dart';
+import 'package:AstrowayCustomer/utils/services/api_helper.dart';
 import 'package:AstrowayCustomer/controllers/follow_astrologer_controller.dart';
 import 'package:AstrowayCustomer/controllers/gift_controller.dart';
 import 'package:AstrowayCustomer/controllers/homeController.dart';
@@ -18,6 +20,7 @@ import 'package:AstrowayCustomer/controllers/walletController.dart';
 import 'package:AstrowayCustomer/main.dart';
 import 'package:AstrowayCustomer/views/astrologerProfile/availabilityScreen.dart';
 import 'package:AstrowayCustomer/views/astrologerProfile/chat_with_assistant_screen.dart';
+import 'package:AstrowayCustomer/views/chat/chat_screen.dart';
 import 'package:AstrowayCustomer/views/paymentInformationScreen.dart';
 import 'package:AstrowayCustomer/views/stories/viewStories.dart';
 import 'package:AstrowayCustomer/widget/showReviewWidget.dart';
@@ -57,6 +60,9 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
 
   BottomNavigationController bottomNavigationController2 =
       Get.find<BottomNavigationController>();
+  
+  // ✅ WHATSAPP-LIKE: Auto-refresh status every 30 seconds
+  Timer? _statusRefreshTimer;
 
   Future<void> dialogForJoinInWaitList(
       context, String astrologerName, bool forChat, String status) async {
@@ -313,9 +319,38 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
 
   @override
   void initState() {
-    homeController
-        .getAstroStory(bottomController.astrologerbyId[0].id.toString());
     super.initState();
+    homeController
+        .getAstroStory(bottomNavigationController.astrologerbyId[0].id.toString());
+    
+    // ✅ WHATSAPP-LIKE: Refresh status immediately on profile load
+    _refreshAstrologerStatus();
+    
+    // ✅ WHATSAPP-LIKE: Auto-refresh every 30 seconds
+    _statusRefreshTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+      _refreshAstrologerStatus();
+    });
+  }
+  
+  @override
+  void dispose() {
+    _statusRefreshTimer?.cancel();
+    super.dispose();
+  }
+  
+  // ✅ WHATSAPP-LIKE: Refresh astrologer status
+  Future<void> _refreshAstrologerStatus() async {
+    try {
+      if (bottomNavigationController.astrologerbyId.isNotEmpty) {
+        await bottomNavigationController.getAstrologerbyId(
+          bottomNavigationController.astrologerbyId[0].id!,
+          forceRefresh: true,
+        );
+        print('🔄 [CUSTOMER] Astrologer status refreshed');
+      }
+    } catch (e) {
+      print('❌ [CUSTOMER] Failed to refresh status: $e');
+    }
   }
 
   @override
@@ -2317,106 +2352,44 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                         GetBuilder<ChatController>(builder: (chatController) {
                       return InkWell(
                         onTap: () async {
+                          // 🚀 WHATSAPP-LIKE: Instant chat (no validation, no payment, no dialogs)
                           bool isLogin = await global.isLogin();
-                          if (isLogin) {
-                            double charge = double.parse(
-                                bottomNavigationController
-                                    .astrologerbyId[0].charge!
-                                    .toString());
-                            if (charge * 5 <=
-                                    global.splashController.currentUser!
-                                        .walletAmount! ||
-                                bottomNavigationController
-                                        .astrologerbyId[0].isFreeAvailable ==
-                                    true) {
-                              if (bottomNavigationController
-                                      .astrologerbyId[0].chatStatus ==
-                                  "Online") {
-                                await bottomNavigationController
-                                    .checkAlreadyInReq(
-                                        bottomNavigationController
-                                            .astrologerbyId[0].id!);
-                                if (bottomNavigationController
-                                        .isUserAlreadyInChatReq ==
-                                    false) {
-                                  global.showOnlyLoaderDialog(context);
-
-                                  if (bottomNavigationController
-                                          .astrologerbyId[0].chatWaitTime !=
-                                      null) {
-                                    if (bottomNavigationController
-                                            .astrologerbyId[0].chatWaitTime!
-                                            .difference(DateTime.now())
-                                            .inMinutes <
-                                        0) {
-                                      await bottomNavigationController
-                                          .changeOfflineStatus(
-                                              bottomNavigationController
-                                                  .astrologerbyId[0].id!,
-                                              "Online");
-                                    }
-                                  }
-
-                                  // BYPASS INTAKE FORM - Send direct chat request
-                                  print('🎯 [ASTROLOGER PROFILE TAB] Sending direct chat request to ${bottomNavigationController.astrologerbyId[0].name}');
-                                  
-                                  try {
-                                    ChatController chatController = Get.find<ChatController>();
-                                    await chatController.sendDirectChatRequest(
-                                      bottomNavigationController.astrologerbyId[0].id!,
-                                      bottomNavigationController.astrologerbyId[0].name!,
-                                    );
-                                    print('✅ [ASTROLOGER PROFILE TAB] Chat request completed');
-                                  } catch (e) {
-                                    print('❌ [ASTROLOGER PROFILE TAB] Chat error: ${e.toString()}');
-                                    global.showToast(
-                                      message: 'Failed to send chat request. Please try again.',
-                                      textColor: global.textColor,
-                                      bgColor: global.toastBackGoundColor,
-                                    );
-                                  } finally {
-                                    global.hideLoader();
-                                  }
-                                } else {
-                                  bottomNavigationController
-                                      .dialogForNotCreatingSession(context);
-                                }
-                              } else if (bottomNavigationController
-                                          .astrologerbyId[0].chatStatus ==
-                                      "Offline" ||
-                                  bottomNavigationController
-                                          .astrologerbyId[0].chatStatus ==
-                                      "Wait Time") {
-                                dialogForJoinInWaitList(
-                                    context,
-                                    bottomNavigationController
-                                        .astrologerbyId[0].name!,
-                                    true,
-                                    bottomNavigationController
-                                        .astrologerbyId[0].chatStatus
-                                        .toString());
-                              } else if (bottomNavigationController
-                                      .astrologerbyId[0].chatStatus ==
-                                  "Busy") {
-                                dialogForJoinInWaitList(
-                                    context,
-                                    bottomNavigationController
-                                        .astrologerbyId[0].name!,
-                                    true,
-                                    bottomNavigationController
-                                        .astrologerbyId[0].chatStatus
-                                        .toString());
-                              }
-                            } else {
-                              global.showOnlyLoaderDialog(context);
-                              await walletController.getAmount();
-                              global.hideLoader();
-                              openBottomSheetRechrage(
-                                  context,
-                                  (charge * 5).toString(),
-                                  'chat',
-                                  '${bottomNavigationController.astrologerbyId[0].name}');
-                            }
+                          if (!isLogin) return;
+                          
+                          final apiHelper = APIHelper();
+                          final astrologerId = bottomNavigationController.astrologerbyId[0].id!;
+                          final expertName = bottomNavigationController.astrologerbyId[0].name!;
+                          final expertProfile = bottomNavigationController.astrologerbyId[0].profileImage ?? '';
+                          
+                          global.showOnlyLoaderDialog(context);
+                          
+                          try {
+                            // Send FCM to expert
+                            final result = await apiHelper.notifyChatStart(astrologerId);
+                            final chatId = result?['chatId'] ?? '${astrologerId}_${global.currentUserId}';
+                            
+                            global.hideLoader();
+                            
+                            // 🚀 Navigate to chat screen instantly
+                            print('🚀 [WHATSAPP] Navigating to chat with $expertName, chatId: $chatId');
+                            Get.to(() => AcceptChatScreen(
+                              flagId: 0, // 0 = WhatsApp-like (no timer/restrictions)
+                              profileImage: expertProfile,
+                              astrologerName: expertName,
+                              fireBasechatId: chatId,
+                              chatId: 0, // Not using old chat request system
+                              astrologerId: astrologerId,
+                              fcmToken: null,
+                              duration: '0', // Unlimited
+                            ));
+                          } catch (e) {
+                            global.hideLoader();
+                            print('❌ [WHATSAPP] Chat error: $e');
+                            global.showToast(
+                              message: 'Failed to start chat',
+                              textColor: global.textColor,
+                              bgColor: global.toastBackGoundColor,
+                            );
                           }
                         },
                         child: Card(

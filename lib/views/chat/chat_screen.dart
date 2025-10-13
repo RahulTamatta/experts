@@ -77,7 +77,10 @@ class _AcceptChatScreenState extends State<AcceptChatScreen> {
   final historyController = Get.find<HistoryController>();
   @override
   void dispose() {
-    timerController.secTimer!.cancel();
+    // 🚀 WHATSAPP-LIKE: Only cancel timer if it exists (flagId != 0)
+    if (widget.flagId != 0 && timerController.secTimer != null) {
+      timerController.secTimer!.cancel();
+    }
     log('ondispose called acceptchat screen');
     super.dispose();
   }
@@ -1037,7 +1040,7 @@ class _AcceptChatScreenState extends State<AcceptChatScreen> {
                     ? const SizedBox()
                     : Align(
                   alignment: Alignment.bottomCenter,
-                  child: widget.flagId == 0
+                  child: widget.flagId == 999 // 🚀 WHATSAPP-LIKE: Never show review card, always show text field
                       ? GestureDetector(
                     onTap: () {
                       debugPrint('clicked');
