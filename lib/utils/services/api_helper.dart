@@ -3304,4 +3304,121 @@ class APIHelper {
       return null;
     }
   }
+
+  // ✅ AGORA RTM CHAT - Get RTM Token
+  Future<APIResult> getChatRTMToken(int userId, String userType) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/chat/getChatRTMToken'),
+        headers: await global.getApiHeaders(true),
+        body: json.encode({
+          "userId": userId,
+          "userType": userType, // 'customer' or 'astrologer'
+        }),
+      );
+      debugPrint('✅ [AGORA RTM] Token response: ${response.body}');
+      dynamic recordList;
+      if (response.statusCode == 200) {
+        recordList = json.decode(response.body);
+      } else {
+        recordList = null;
+      }
+      return APIResult.fromJson({'status': '${response.statusCode}'}, recordList);
+    } catch (e) {
+      debugPrint('❌ Exception in getChatRTMToken: $e');
+      return APIResult.fromJson({'status': '500'}, null);
+    }
+  }
+
+  // ✅ AGORA RTM CHAT - Store Message
+  Future<APIResult> storeMessage(Map<String, dynamic> messageData) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/chat/storeMessage'),
+        headers: await global.getApiHeaders(true),
+        body: json.encode(messageData),
+      );
+      debugPrint('✅ [AGORA RTM] Message stored: ${response.body}');
+      dynamic recordList;
+      if (response.statusCode == 200) {
+        recordList = json.decode(response.body);
+      } else {
+        recordList = null;
+      }
+      return APIResult.fromJson({'status': '${response.statusCode}'}, recordList);
+    } catch (e) {
+      debugPrint('❌ Exception in storeMessage: $e');
+      return APIResult.fromJson({'status': '500'}, null);
+    }
+  }
+
+  // ✅ AGORA RTM CHAT - Get Chat History
+  Future<APIResult> getChatHistory(String chatId, {int limit = 50, int offset = 0}) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/chat/getChatHistory'),
+        headers: await global.getApiHeaders(true),
+        body: json.encode({
+          "chat_id": chatId,
+          "limit": limit,
+          "offset": offset,
+        }),
+      );
+      debugPrint('✅ [AGORA RTM] Chat history retrieved: ${response.body}');
+      dynamic recordList;
+      if (response.statusCode == 200) {
+        recordList = json.decode(response.body);
+      } else {
+        recordList = null;
+      }
+      return APIResult.fromJson({'status': '${response.statusCode}'}, recordList);
+    } catch (e) {
+      debugPrint('❌ Exception in getChatHistory: $e');
+      return APIResult.fromJson({'status': '500'}, null);
+    }
+  }
+
+  // ✅ AGORA RTM CHAT - Mark Messages as Read
+  Future<APIResult> markMessagesAsRead(List<int> messageIds) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/chat/markAsRead'),
+        headers: await global.getApiHeaders(true),
+        body: json.encode({"message_ids": messageIds}),
+      );
+      debugPrint('✅ [AGORA RTM] Messages marked as read: ${response.body}');
+      dynamic recordList;
+      if (response.statusCode == 200) {
+        recordList = json.decode(response.body);
+      } else {
+        recordList = null;
+      }
+      return APIResult.fromJson({'status': '${response.statusCode}'}, recordList);
+    } catch (e) {
+      debugPrint('❌ Exception in markMessagesAsRead: $e');
+      return APIResult.fromJson({'status': '500'}, null);
+    }
+  }
+
+  // ✅ AGORA RTM CHAT - Get Chat List
+  Future<APIResult> getChatList(String userType) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/chat/getChatList'),
+        headers: await global.getApiHeaders(true),
+        body: json.encode({"userType": userType}),
+      );
+      debugPrint('✅ [AGORA RTM] Chat list retrieved: ${response.body}');
+      dynamic recordList;
+      if (response.statusCode == 200) {
+        recordList = json.decode(response.body);
+      } else {
+        recordList = null;
+      }
+      return APIResult.fromJson({'status': '${response.statusCode}'}, recordList);
+    } catch (e) {
+      debugPrint('❌ Exception in getChatList: $e');
+      return APIResult.fromJson({'status': '500'}, null);
+    }
+  }
 }

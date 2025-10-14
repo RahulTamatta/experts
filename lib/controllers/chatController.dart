@@ -325,10 +325,15 @@ class ChatController extends GetxController
       print('🚀 [FREE CHAT] Astrologer Name: $astrologerName');
       print('🚀 [FREE CHAT] User ID: ${global.currentUserId}');
       
+      String chatId = '${astrologerId}_${global.currentUserId}';
+      
+      // Store customer metadata in Firebase for expert app to read
+      await _storeCustomerMetadata(chatId, astrologerId);
+      
       // Send initial greeting message
       await sendMessage(
         'Hi $astrologerName, I would like to chat with you.',
-        '${astrologerId}_${global.currentUserId}',
+        chatId,
         astrologerId,
         false,
       );
@@ -355,6 +360,33 @@ class ChatController extends GetxController
     }
   }
 
+  // Store customer name & details in Firebase for expert app to display
+  Future<void> _storeCustomerMetadata(String chatId, int astrologerId) async {
+    try {
+      String customerName = global.user.contactNo ?? 
+                           global.user.name ?? 
+                           'Customer ${global.currentUserId}';
+      
+      print('💾 [METADATA] Storing customer name: $customerName');
+      
+      await FirebaseFirestore.instance
+          .collection('chats')
+          .doc(chatId)
+          .set({
+            'customerName': customerName,
+            'customerId': global.currentUserId.toString(),
+            'astrologerId': astrologerId,
+            'customerPhone': global.user.contactNo ?? '',
+            'lastUpdated': FieldValue.serverTimestamp(),
+          }, SetOptions(merge: true));
+      
+      print('✅ [METADATA] Customer metadata stored successfully');
+    } catch (e) {
+      print('❌ [METADATA] Failed to store metadata: $e');
+      // Don't throw - this is not critical
+    }
+  }
+
   bool isMe = true;
   Stream<QuerySnapshot<Map<String, dynamic>>>? getChatMessages(
       String firebaseChatId, int? currentUserId) {
@@ -377,6 +409,10 @@ class ChatController extends GetxController
       String message, String chatId, int partnerId, bool isEndMessage) async {
     try {
       if (message.trim() != '') {
+        // Store/update customer metadata every time we send a message
+        // This ensures expert always has the latest customer info
+        await _storeCustomerMetadata(chatId, partnerId);
+        
         ChatMessageModel chatMessage = ChatMessageModel(
           message: message,
           createdAt: DateTime.now(),
