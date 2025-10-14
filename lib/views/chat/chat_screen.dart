@@ -36,6 +36,7 @@ import '../../controllers/walletController.dart';
 
 import '../../model/chat_message_model.dart';
 import '../../utils/images.dart';
+import '../../utils/services/api_helper.dart';
 import '../astrologerProfile/astrologerProfile.dart';
 import '../bottomNavigationBarScreen.dart';
 import '../customDialog.dart';
@@ -75,6 +76,7 @@ class _AcceptChatScreenState extends State<AcceptChatScreen> {
   final chatController = Get.find<ChatController>();
   final callController = Get.find<CallController>();
   final historyController = Get.find<HistoryController>();
+  final apiHelper = APIHelper();
   @override
   void dispose() {
     // 🚀 WHATSAPP-LIKE: Only cancel timer if it exists (flagId != 0)
@@ -89,6 +91,21 @@ class _AcceptChatScreenState extends State<AcceptChatScreen> {
   void initState() {
     super.initState();
     chatController.isTimerEnded = false;
+    
+    // 🚀 WHATSAPP-LIKE: Send FCM notification to expert when chat opens
+    if (widget.flagId == 0) {
+      _notifyExpertChatOpened();
+    }
+  }
+  
+  Future<void> _notifyExpertChatOpened() async {
+    try {
+      print('🚀 [CUSTOMER] Notifying expert about chat...');
+      await apiHelper.notifyChatStart(widget.astrologerId);
+      print('✅ [CUSTOMER] Expert notified successfully');
+    } catch (e) {
+      print('❌ [CUSTOMER] Failed to notify expert: $e');
+    }
   }
 
   @override

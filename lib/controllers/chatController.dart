@@ -398,7 +398,11 @@ class ChatController extends GetxController
   uploadMessage(
       String idUser, String partnerId, ChatMessageModel msgModel) async {
     try {
+      print('🔥🔥🔥 [UPLOAD] Starting message upload to Firebase');
+      print('🔥🔥🔥 [UPLOAD] chatId: $idUser, partnerId: $partnerId');
+      
       final String globalId = global.currentUserId.toString();
+      print('🔥🔥🔥 [UPLOAD] currentUserId: $globalId');
 
       final refMessages = userChatCollectionRef
           .doc(idUser)
@@ -417,6 +421,10 @@ class ChatController extends GetxController
 
       newMessage2.isRead = false;
 
+      print('🔥🔥🔥 [UPLOAD] Firebase path 1: chats/$idUser/userschat/$globalId/messages');
+      print('🔥🔥🔥 [UPLOAD] Firebase path 2: chats/$idUser/userschat/$partnerId/messages');
+      print('🔥🔥🔥 [UPLOAD] Message content: ${msgModel.message}');
+
       final batch = FirebaseFirestore.instance.batch();
 
       final messageResult = refMessages.doc();
@@ -424,12 +432,18 @@ class ChatController extends GetxController
 
       final message1Result1 = refMessages1.doc();
       batch.set(message1Result1, newMessage2.toJson());
+      
       isUploading = false;
       update();
+      
+      print('🔥🔥🔥 [UPLOAD] Committing batch to Firebase...');
       await batch.commit();
+      print('✅✅✅ [UPLOAD] Message successfully uploaded to Firebase!');
+      
     } catch (err) {
       isUploading = false;
       update();
+      print('❌❌❌ [UPLOAD] Firebase upload error: $err');
       log('uploadMessage err $err');
       return {};
     }
