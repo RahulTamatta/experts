@@ -1224,7 +1224,31 @@ class APIHelper {
     }
   }
 
-//call Astrologer request API
+//🚀 WHATSAPP-LIKE: Direct call (no request, instant connection)
+  Future<dynamic> startDirectCall(
+      int astrologerId, String callType) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/agora/startDirectCall'),
+        headers: await global.getApiHeaders(true),
+        body: json.encode({
+          'astrologerId': astrologerId,
+          'call_type': callType == "video" ? '11' : '10',
+        }),
+      );
+      dynamic recordList;
+      if (response.statusCode == 200) {
+        recordList = json.decode(response.body);
+      } else {
+        recordList = null;
+      }
+      return getAPIResult(response, recordList);
+    } catch (e) {
+      debugPrint('Exception:- in startDirectCall ' + e.toString());
+    }
+  }
+
+  //🚀 LEGACY: Old call request API (kept for compatibility)
   Future<dynamic> sendAstrologerCallRequest(
       int astrologerId, bool isFreeSession, String type, String time) async {
     try {

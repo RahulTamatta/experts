@@ -82,6 +82,41 @@ class CallController extends GetxController
     update();
   }
 
+  // 🚀 WHATSAPP-LIKE: Direct call (no request, instant connection)
+  Future<void> startDirectCall({
+    required int astrologerId,
+    required String astrologerName,
+    required String callType, // 'audio' or 'video'
+    String? astrologerProfile,
+  }) async {
+    try {
+      final result = await apiHelper.startDirectCall(astrologerId, callType);
+      
+      if (result != null && result.status == "200") {
+        // Call started successfully, navigate to call screen
+        global.showToast(
+          message: 'Connecting to $astrologerName...',
+          textColor: global.textColor,
+          bgColor: global.toastBackGoundColor,
+        );
+      } else {
+        global.showToast(
+          message: result?.message ?? 'Failed to start call',
+          textColor: global.textColor,
+          bgColor: global.toastBackGoundColor,
+        );
+      }
+    } catch (e) {
+      print('Exception in startDirectCall: ${e.toString()}');
+      global.showToast(
+        message: 'Failed to start call: $e',
+        textColor: global.textColor,
+        bgColor: global.toastBackGoundColor,
+      );
+    }
+  }
+
+  // 🚀 LEGACY: Old call request system (kept for compatibility)
   sendCallRequest(
       int astrologerId, bool isFreeSession, String type, String mins) async {
     try {
