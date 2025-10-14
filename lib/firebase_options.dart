@@ -18,13 +18,11 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: "AIzaSyAyiZi-oi6QilI2X-7hNcCgtbmRT2WLAhs",
-    authDomain: "astroway-diploy.firebaseapp.com",
-    projectId: "astroway-diploy",
-    storageBucket: "astroway-diploy.appspot.com",
-    messagingSenderId: "381086206621", //381086206621
-    appId: "1:381086206621:android:b5c7542da161358d32e274",
-    measurementId: "G-KBPRBBZRYC",
+    apiKey: "AIzaSyArHRbVqytdARFlufcMHfsZY7T3l8zsMOw",
+    projectId: "fittalk-ed0e7",
+    storageBucket: "fittalk-ed0e7.firebasestorage.app",
+    messagingSenderId: "11780657341",
+    appId: "1:11780657341:android:64add57cd842a56ae3e7d4",
   );
 
   static const FirebaseOptions ios = FirebaseOptions(

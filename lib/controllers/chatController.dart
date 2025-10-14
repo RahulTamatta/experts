@@ -463,6 +463,21 @@ class ChatController extends GetxController
 
       final batch = FirebaseFirestore.instance.batch();
 
+      // 🔥 CRITICAL FIX: Create root document with metadata so expert app can see it
+      final chatDocRef = userChatCollectionRef.doc(idUser);
+      final chatMetadata = {
+        'chatId': idUser,
+        'customerId': globalId,
+        'astrologerId': partnerId,
+        'customerName': global.user.name ?? 'Customer',
+        'lastMessage': msgModel.message,
+        'lastMessageTime': msgModel.createdAt,
+        'createdAt': DateTime.now(),
+        'isActive': true,
+      };
+      batch.set(chatDocRef, chatMetadata, SetOptions(merge: true));
+      print('🔥🔥🔥 [UPLOAD] Creating root document: chats/$idUser with metadata');
+
       final messageResult = refMessages.doc();
       batch.set(messageResult, newMessage1.toJson());
 
@@ -475,6 +490,7 @@ class ChatController extends GetxController
       print('🔥🔥🔥 [UPLOAD] Committing batch to Firebase...');
       await batch.commit();
       print('✅✅✅ [UPLOAD] Message successfully uploaded to Firebase!');
+      print('✅✅✅ [UPLOAD] Root document created - expert app can now see this chat!');
       
     } catch (err) {
       isUploading = false;
