@@ -1182,7 +1182,8 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                                                 await callController.sendDirectCallRequest(
                                                   bottomNavigationController.astrologerbyId[0].id!,
                                                   bottomNavigationController.astrologerbyId[0].name!,
-                                                  "Call",
+                                                  "call",
+                                                  bottomNavigationController.astrologerbyId[0].profileImage,
                                                 );
                                                 print('✅ [ASTROLOGER PROFILE] Call request completed');
                                               } catch (e) {
@@ -2521,18 +2522,20 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                                     }
                                   }
                                   // BYPASS INTAKE FORM - Send direct call request
-                                  print('📞 [ASTROLOGER PROFILE TAB] Sending direct call request to ${bottomNavigationController.astrologerbyId[0].name}');
+                                  print('📞 [AUDIO BUTTON] Sending direct call request to ${bottomNavigationController.astrologerbyId[0].name}');
                                   
                                   try {
                                     CallController callController = Get.find<CallController>();
                                     await callController.sendDirectCallRequest(
                                       bottomNavigationController.astrologerbyId[0].id!,
                                       bottomNavigationController.astrologerbyId[0].name!,
-                                      "Call",
+                                      "call", // ← FIXED: was "Call", now "call"
+                                      bottomNavigationController.astrologerbyId[0].profileImage,
                                     );
-                                    print('✅ [ASTROLOGER PROFILE TAB] Call request completed');
+                                    print('✅ [AUDIO BUTTON] Call request completed successfully!');
                                   } catch (e) {
-                                    print('❌ [ASTROLOGER PROFILE TAB] Call error: ${e.toString()}');
+                                    print('❌ [AUDIO BUTTON] Call error: ${e.toString()}');
+                                    print('❌ [AUDIO BUTTON] Stack trace: ${StackTrace.current}');
                                     global.showToast(
                                       message: 'Failed to send call request. Please try again.',
                                       textColor: global.textColor,
@@ -2706,18 +2709,20 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                                     }
                                   }
                                   // BYPASS INTAKE FORM - Send direct video call request
-                                  print('📹 [ASTROLOGER PROFILE TAB] Sending direct video call request to ${bottomNavigationController.astrologerbyId[0].name}');
+                                  print('📹 [VIDEO BUTTON] Sending direct video call request to ${bottomNavigationController.astrologerbyId[0].name}');
                                   
                                   try {
                                     CallController callController = Get.find<CallController>();
                                     await callController.sendDirectCallRequest(
                                       bottomNavigationController.astrologerbyId[0].id!,
                                       bottomNavigationController.astrologerbyId[0].name!,
-                                      "Videocall",
+                                      "Videocall", // ← Correct for video calls
+                                      bottomNavigationController.astrologerbyId[0].profileImage,
                                     );
-                                    print('✅ [ASTROLOGER PROFILE TAB] Video call request completed');
+                                    print('✅ [VIDEO BUTTON] Video call request completed successfully!');
                                   } catch (e) {
-                                    print('❌ [ASTROLOGER PROFILE TAB] Video call error: ${e.toString()}');
+                                    print('❌ [VIDEO BUTTON] Video call error: ${e.toString()}');
+                                    print('❌ [VIDEO BUTTON] Stack trace: ${StackTrace.current}');
                                     global.showToast(
                                       message: 'Failed to send video call request. Please try again.',
                                       textColor: global.textColor,

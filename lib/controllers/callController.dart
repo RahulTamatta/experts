@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:get/get.dart';
 import 'package:AstrowayCustomer/utils/global.dart' as global;
-import 'package:AstrowayCustomer/views/call/accept_call_screen.dart';
+import 'package:AstrowayCustomer/views/call/calling_screen.dart';
 
 class CallController extends GetxController
     with GetSingleTickerProviderStateMixin {
@@ -142,33 +142,85 @@ class CallController extends GetxController
     }
   }
 
-  // 🚀 INSTANT DIRECT CALL - No request/accept flow, immediate call initiation
-  Future<void> sendDirectCallRequest(int astrologerId, String astrologerName, String type) async {
+  // 🚀 WHATSAPP-LIKE INSTANT CALL - Direct call with immediate Agora join
+  Future<void> sendDirectCallRequest(int astrologerId, String astrologerName, String type, [String? astrologerProfile]) async {
     try {
-      print('🚀 [INSTANT CALL] Starting instant $type call');
-      print('🚀 [INSTANT CALL] Astrologer ID: $astrologerId');
-      print('🚀 [INSTANT CALL] Astrologer Name: $astrologerName');
-      print('🚀 [INSTANT CALL] Call Type: $type');
-      print('🚀 [INSTANT CALL] User ID: ${global.currentUserId}');
+      print('═══════════════════════════════════════════════════════════');
+      print('🚀 [WHATSAPP CALL] Starting instant call');
+      print('═══════════════════════════════════════════════════════════');
+      print('🚀 [CALL] Astrologer ID: $astrologerId');
+      print('🚀 [CALL] Astrologer Name: $astrologerName');
+      print('🚀 [CALL] Call Type: $type');
+      print('🚀 [CALL] Profile Image: ${astrologerProfile ?? "null"}');
+      print('🚀 [CALL] API Endpoint: /callRequest/add');
       
-      // Show loading indicator
+      // Show connecting toast
       global.showToast(
-        message: 'Connecting to $astrologerName...',
+        message: 'Calling $astrologerName...',
         textColor: global.textColor,
         bgColor: global.toastBackGoundColor,
       );
       
-      // Generate unique call ID and channel name
-      String callId = '${astrologerId}_${global.currentUserId}_${DateTime.now().millisecondsSinceEpoch}';
-      String channelName = 'call_$callId';
+      print('📞 [API] Calling backend to create call request...');
       
-      // Directly initiate call without backend request/accept flow
-      await _initiateDirectCall(astrologerId, astrologerName, type, callId, channelName);
+      // Call backend API to initiate call and get Agora credentials
+      final result = await apiHelper.sendAstrologerCallRequest(
+        astrologerId, 
+        true, // isFreeSession
+        type, 
+        '999999' // unlimited duration
+      );
       
-      print('🚀 [INSTANT CALL] $type call initiated successfully');
+      print('📞 [API] Backend response received');
+      print('📞 [API] Result is null: ${result == null}');
+      print('📞 [API] Result status: ${result?.status}');
       
-    } catch (e) {
-      print('❌ [INSTANT CALL] Exception: ${e.toString()}');
+      if (result != null && result.status == "200") {
+        final callData = result.recordList;
+        
+        print('✅ [SUCCESS] Got Agora credentials from backend!');
+        print('✅ [SUCCESS] Call ID: ${callData['callId']}');
+        print('✅ [SUCCESS] Channel Name: ${callData['channelName']}');
+        print('✅ [SUCCESS] Token Length: ${callData['token']?.length ?? 0} chars');
+        print('✅ [SUCCESS] Duration: ${callData['duration'] ?? '999999'}');
+        print('✅ [SUCCESS] App ID: ${callData['appId'] ?? "not returned"}');
+        
+        // Navigate to calling screen (shows "Calling..." while waiting for expert)
+        print('📱 [NAVIGATION] Navigating to CallingScreen...');
+        Get.to(() => CallingScreen(
+          astrologerName: astrologerName,
+          astrologerId: astrologerId,
+          astrologerProfile: astrologerProfile ?? '',
+          callId: callData['callId'],
+          callType: type,
+          channelName: callData['channelName'],
+          token: callData['token'],
+          duration: callData['duration'] ?? '999999',
+        ));
+        
+        print('✅ [NAVIGATION] Successfully navigated to calling screen');
+        print('✅ [CALL] Customer is now waiting for expert to accept...');
+        print('═══════════════════════════════════════════════════════════');
+        
+      } else {
+        print('❌ [ERROR] Failed to get valid response from backend');
+        print('❌ [ERROR] Status: ${result?.status ?? "null"}');
+        // Avoid accessing a non-existent message field on APIResult
+        final fallbackMsg = (result?.status?.toString() == '500')
+            ? 'Server error (500). Please try again.'
+            : 'Failed to start call. Please try again.';
+        global.showToast(
+          message: fallbackMsg,
+          textColor: global.textColor,
+          bgColor: global.toastBackGoundColor,
+        );
+      }
+      
+    } catch (e, stackTrace) {
+      print('❌ [EXCEPTION] Error in sendDirectCallRequest');
+      print('❌ [EXCEPTION] Error: ${e.toString()}');
+      print('❌ [EXCEPTION] Stack trace: $stackTrace');
+      print('═══════════════════════════════════════════════════════════');
       global.showToast(
         message: 'Failed to connect to $astrologerName',
         textColor: global.textColor,
@@ -177,57 +229,7 @@ class CallController extends GetxController
     }
   }
 
-  // 🎯 Direct call initiation without request/accept flow
-  Future<void> _initiateDirectCall(int astrologerId, String astrologerName, String type, String callId, String channelName) async {
-    try {
-      // Set up call parameters
-      global.agoraChannelName = channelName;
-      global.agoraToken = ""; // Will be generated by Agora or use temp token
-      
-      // Navigate directly to call screen
-      if (type.toLowerCase() == 'call' || type.toLowerCase() == 'videocall') {
-        // Use AcceptCallScreen for both audio and video calls
-        Get.to(() => AcceptCallScreen(
-          astrologerId: astrologerId,
-          astrologerName: astrologerName,
-          astrologerProfile: '',
-          token: global.agoraToken,
-          callChannel: channelName,
-          callId: int.tryParse(callId.split('_').last) ?? 0,
-          duration: '999999', // Unlimited duration for direct calls
-          isfromnotification: false, // Direct call, not from notification
-        ));
-      }
-      
-      // Optional: Send notification to expert (non-blocking)
-      _notifyExpertOfDirectCall(astrologerId, astrologerName, type, callId, channelName);
-      
-      print('🎯 [DIRECT CALL] Call screen opened for $type with $astrologerName');
-      
-    } catch (e) {
-      print('❌ [DIRECT CALL] Failed to initiate call: $e');
-      throw e;
-    }
-  }
-
-  // 📱 Send notification to expert about incoming direct call (optional, non-blocking)
-  Future<void> _notifyExpertOfDirectCall(int astrologerId, String astrologerName, String type, String callId, String channelName) async {
-    try {
-      // This is optional - just notify expert but don't wait for acceptance
-      // Expert can join the call directly if available
-      
-      // Send FCM notification to expert (fire and forget)
-      // This doesn't block the call - customer can start talking immediately
-      print('📱 [NOTIFICATION] Sending direct call notification to expert $astrologerId');
-      print('📱 [NOTIFICATION] Call details: $type call on channel $channelName');
-      
-      // TODO: Implement actual FCM notification sending here if needed
-      // For now, just log the notification attempt
-      
-    } catch (e) {
-      print('⚠️ [NOTIFICATION] Failed to notify expert: $e (call continues anyway)');
-    }
-  }
+  // Removed unused direct call methods - now using WhatsApp-like flow with backend
 
   acceptedCall(int callId) async {
     try {

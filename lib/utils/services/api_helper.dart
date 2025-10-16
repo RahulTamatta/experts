@@ -1252,25 +1252,44 @@ class APIHelper {
   Future<dynamic> sendAstrologerCallRequest(
       int astrologerId, bool isFreeSession, String type, String time) async {
     try {
+      final callType = type == "Videocall" ? 11 : 10;
+      final requestBody = {
+        'astrologerId': '$astrologerId',
+        "isFreeSession": isFreeSession,
+        "call_type": callType,
+        "call_duration": time
+      };
+      
+      debugPrint('📞 [API HELPER] sendAstrologerCallRequest called');
+      debugPrint('📞 [API] URL: $baseUrl/callRequest/add');
+      debugPrint('📞 [API] Astrologer ID: $astrologerId');
+      debugPrint('📞 [API] Type: $type → call_type: $callType (${callType == 11 ? "Video" : "Audio"})');
+      debugPrint('📞 [API] isFreeSession: $isFreeSession');
+      debugPrint('📞 [API] Duration: $time');
+      debugPrint('📞 [API] Request body: ${json.encode(requestBody)}');
+      
       final response = await http.post(
         Uri.parse('$baseUrl/callRequest/add'),
         headers: await global.getApiHeaders(true),
-        body: json.encode({
-          'astrologerId': '$astrologerId',
-          "isFreeSession": isFreeSession,
-          "call_type": type == "Videocall" ? 11 : 10,
-          "call_duration": time
-        }),
+        body: json.encode(requestBody),
       );
+      
+      debugPrint('📞 [API] Response status code: ${response.statusCode}');
+      debugPrint('📞 [API] Response body: ${response.body}');
+      
       dynamic recordList;
       if (response.statusCode == 200) {
         recordList = json.decode(response.body)['recordList'];
+        debugPrint('✅ [API] Call request successful! Call ID: ${recordList['callId']}');
       } else {
         recordList = null;
+        debugPrint('❌ [API] Call request failed with status: ${response.statusCode}');
       }
       return getAPIResult(response, recordList);
-    } catch (e) {
-      debugPrint('Exception:- in sendAstrologerCallRequest ' + e.toString());
+    } catch (e, stackTrace) {
+      debugPrint('❌ [API] Exception in sendAstrologerCallRequest: $e');
+      debugPrint('❌ [API] Stack trace: $stackTrace');
+      rethrow;
     }
   }
 
@@ -1530,6 +1549,30 @@ class APIHelper {
       return getAPIResult(response, recordList);
     } catch (e) {
       debugPrint("Exception in rejectChat : -" + e.toString());
+    }
+  }
+
+  // 📞 WHATSAPP-LIKE: Check call status (Ringing/Accepted/Rejected)
+  Future<Map<String, dynamic>?> getCallStatus(int callId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/callRequest/getCallStatus'),
+        headers: await global.getApiHeaders(true),
+        body: json.encode({"callId": callId}),
+      );
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        debugPrint('📞 [GET CALL STATUS] Call ID: $callId, Status: ${data['recordList']?['callStatus']}');
+        return {
+          'status': data['recordList']?['callStatus'],
+          'data': data['recordList'],
+        };
+      }
+      return null;
+    } catch (e) {
+      debugPrint("Exception in getCallStatus: $e");
+      return null;
     }
   }
 
