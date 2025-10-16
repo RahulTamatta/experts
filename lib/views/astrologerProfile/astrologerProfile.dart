@@ -2506,6 +2506,8 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                                         .isUserAlreadyInCallReq ==
                                     false) {
                                   global.showOnlyLoaderDialog(context);
+                                  
+                                  // Check wait time before proceeding
                                   if (bottomNavigationController
                                           .astrologerbyId[0].callWaitTime !=
                                       null) {
@@ -2521,6 +2523,7 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                                               "Online");
                                     }
                                   }
+                                  
                                   // BYPASS INTAKE FORM - Send direct call request
                                   print('📞 [AUDIO BUTTON] Sending direct call request to ${bottomNavigationController.astrologerbyId[0].name}');
                                   
@@ -2536,14 +2539,14 @@ class _AstrologerProfileState extends State<AstrologerProfile> {
                                   } catch (e) {
                                     print('❌ [AUDIO BUTTON] Call error: ${e.toString()}');
                                     print('❌ [AUDIO BUTTON] Stack trace: ${StackTrace.current}');
+                                    global.hideLoader(); // Close loader on error
                                     global.showToast(
                                       message: 'Failed to send call request. Please try again.',
                                       textColor: global.textColor,
                                       bgColor: global.toastBackGoundColor,
                                     );
-                                  } finally {
-                                    global.hideLoader();
                                   }
+                                  // Loader is now closed inside sendDirectCallRequest before navigation
                                 } else {
                                   bottomNavigationController
                                       .dialogForNotCreatingSession(context);

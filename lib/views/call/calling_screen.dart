@@ -78,7 +78,12 @@ class _CallingScreenState extends State<CallingScreen> with SingleTickerProvider
       // Check if call was accepted by expert
       final result = await callController.apiHelper.getCallStatus(widget.callId);
       
-      if (result != null && result['status'] == 'Accepted') {
+      // ✅ FIX: Check recordList.callStatus, not top-level status (which is HTTP 200)
+      final callStatus = result != null && result['recordList'] != null 
+          ? result['recordList']['callStatus'] 
+          : null;
+      
+      if (callStatus == 'Accepted') {
         print('✅ [CALLING SCREEN] Expert accepted! Joining call...');
         _isCallAccepted = true;
         _pollTimer?.cancel();
@@ -94,7 +99,7 @@ class _CallingScreenState extends State<CallingScreen> with SingleTickerProvider
           duration: widget.duration,
           isfromnotification: false,
         ));
-      } else if (result != null && result['status'] == 'Rejected') {
+      } else if (callStatus == 'Rejected') {
         print('❌ [CALLING SCREEN] Expert rejected call');
         _pollTimer?.cancel();
         

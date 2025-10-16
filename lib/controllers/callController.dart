@@ -185,8 +185,16 @@ class CallController extends GetxController
         print('✅ [SUCCESS] Duration: ${callData['duration'] ?? '999999'}');
         print('✅ [SUCCESS] App ID: ${callData['appId'] ?? "not returned"}');
         
+        // ✅ CRITICAL FIX: Close loader BEFORE navigation to prevent dialog conflict
+        // The loader dialog must be dismissed before Get.to() is called
+        global.hideLoader();
+        
+        // Small delay to ensure loader is fully dismissed
+        await Future.delayed(Duration(milliseconds: 100));
+        
         // Navigate to calling screen (shows "Calling..." while waiting for expert)
         print('📱 [NAVIGATION] Navigating to CallingScreen...');
+        
         Get.to(() => CallingScreen(
           astrologerName: astrologerName,
           astrologerId: astrologerId,

@@ -394,6 +394,12 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
   }
 
   void join() async {
+    // ✅ FIX: Use actual customer user ID, not 0
+    if (global.currentUserId == null) {
+      await global.getCurrentUser();
+    }
+    uid = global.currentUserId ?? 0;
+    
     // Set channel options including the client role and channel profile
     ChannelMediaOptions options = const ChannelMediaOptions(
       clientRoleType: ClientRoleType.clientRoleBroadcaster,
@@ -401,8 +407,8 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
     );
     print('in join method of customer call');
     print('token:- ${widget.token!}');
-    print('token:- ${widget.callChannel!}');
-    print('token:- ${uid}');
+    print('channelId:- ${widget.callChannel!}');
+    print('uid:- ${uid}');
     await agoraEngine.joinChannel(
       token: widget.token!,
       channelId: widget.callChannel!,
