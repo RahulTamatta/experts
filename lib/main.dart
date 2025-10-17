@@ -16,6 +16,7 @@ import 'package:AstrowayCustomer/utils/binding/networkBinding.dart';
 import 'package:AstrowayCustomer/utils/global.dart' as global;
 import 'package:AstrowayCustomer/utils/global.dart';
 import 'package:AstrowayCustomer/utils/images.dart';
+import 'package:AstrowayCustomer/utils/incoming_call_dialog.dart';
 import 'package:AstrowayCustomer/views/bottomNavigationBarScreen.dart';
 import 'package:AstrowayCustomer/views/call/accept_call_screen.dart';
 import 'package:AstrowayCustomer/views/call/incoming_call_request.dart';
@@ -398,7 +399,27 @@ class _MyAppState extends State<MyApp> {
           if (message.data.isNotEmpty) {
             var messageData = json.decode((message.data['body']));
             if (messageData['notificationType'] != null) {
-              if (messageData['notificationType'] == 3) {
+              if (messageData['notificationType'] == 2) {
+                log('📞 [CUSTOMER] Incoming call notification received from expert');
+                log('📞 [CUSTOMER] Call Type: ${messageData['call_type']}');
+                log('📞 [CUSTOMER] Astrologer: ${messageData['name']}');
+                log('📞 [CUSTOMER] Channel: ${messageData['channelName']}');
+                log('📞 [CUSTOMER] Token: ${messageData['token']?.substring(0, 30)}...');
+                
+                // Show CallKit incoming call dialog
+                await showIncomingCallDialog(
+                  context: Get.context!,
+                  astrologerId: int.tryParse(messageData['id']?.toString() ?? '0') ?? 0,
+                  astrologerName: messageData['name'] ?? 'Astrologer',
+                  astrologerProfile: messageData['profile'] ?? '',
+                  token: messageData['token'] ?? '',
+                  channelName: messageData['channelName'] ?? '',
+                  callId: int.tryParse(messageData['callId']?.toString() ?? '0') ?? 0,
+                  callType: int.tryParse(messageData['call_type']?.toString() ?? '10') ?? 10,
+                  duration: messageData['call_duration']?.toString() ?? '999999',
+                  appId: messageData['appId'] ?? '',
+                );
+              } else if (messageData['notificationType'] == 3) {
                 // ✅ WHATSAPP-LIKE: Auto-navigate to chat screen when accepted
                 log('🎉 [CUSTOMER] Chat request accepted - auto-navigating to chat');
                 
@@ -892,6 +913,7 @@ void callAccept(CallEvent event) async {
           callChannel: event.body['extra']["channelName"],
           callId: event.body['extra']["callId"],
           duration: event.body['extra']['call_duration'].toString(),
+          appId: event.body['extra']["appId"], // App ID from FCM notification
         ));
   } else if (event.body['extra']['call_type'] == 11) {
     Get.to(() => OneToOneLiveScreen(

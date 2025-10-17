@@ -325,6 +325,7 @@ void callAccept(Map<String, dynamic> extraData) async {
         callChannel: extraData["channelName"],
         callId: extraData["callId"],
         duration: extraData['call_duration'].toString(),
+        appId: extraData["appId"], // App ID from notification
       ),
     );
   } else if (extraData['call_type'] == 11) {

@@ -32,6 +32,7 @@ class AcceptCallScreen extends StatefulWidget {
   final int? callId;
   bool isfromnotification;
   String? duration;
+  final String? appId; // App ID from backend (must match token)
   AcceptCallScreen({
     super.key,
     this.astrologerName,
@@ -42,6 +43,7 @@ class AcceptCallScreen extends StatefulWidget {
     this.callChannel,
     this.duration,
     this.isfromnotification = false,
+    this.appId,
   });
 
   @override
@@ -96,7 +98,6 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
         return false;
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -138,28 +139,30 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
                   width: 120,
                   alignment: Alignment.center,
                   margin: EdgeInsets.only(bottom: Get.height * 0.1),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Get.theme.primaryColor),
+                    borderRadius: BorderRadius.circular(7),
+                  ),
                   child: CircleAvatar(
                     backgroundColor: Colors.transparent,
                     radius: 60,
-                    child: widget.astrologerProfile == null
+                    child: widget.astrologerProfile == null || widget.astrologerProfile == ""
                         ? Image.asset(
                             Images.deafultUser,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.contain,
+                            height: 60,
+                            width: 40,
                           )
                         : CachedNetworkImage(
-                            height: 12.h,
-                            width: 12.h,
-                            imageUrl:
-                                '${global.imgBaseurl}${widget.astrologerProfile}',
+                            imageUrl: '${global.imgBaseurl}${widget.astrologerProfile}',
                             imageBuilder: (context, imageProvider) =>
                                 CircleAvatar(
-                              radius: 5.h,
+                              radius: 60,
                               backgroundColor: Colors.transparent,
                               child: Image.network(
-                                height: 12.h,
-                                width: 12.h,
                                 '${global.imgBaseurl}${widget.astrologerProfile}',
-                                fit: BoxFit.cover,
+                                fit: BoxFit.contain,
+                                height: 60,
                               ),
                             ),
                             placeholder: (context, url) => const Center(
@@ -174,7 +177,7 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
                   ),
                 ),
               ),
-            ),
+            )
           ],
         ),
         bottomSheet: Container(
@@ -187,14 +190,13 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
               InkWell(
                 onTap: () {
                   setState(() {
-                    callVolume = 100;
                     isSpeaker = !isSpeaker;
                   });
                   onVolume(isSpeaker);
                 },
                 child: Icon(
-                  Icons.volume_up,
-                  color: isSpeaker ? Colors.blue : Colors.white,
+                  isSpeaker ? Icons.volume_up : Icons.volume_off,
+                  color: Colors.black,
                 ),
               ),
               InkWell(
@@ -223,12 +225,11 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
                 },
                 child: Container(
                   padding: const EdgeInsets.all(10),
-                  margin: const EdgeInsets.only(right: 20),
                   decoration: BoxDecoration(
                     color: Colors.red,
                     borderRadius: BorderRadius.circular(30),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     Icons.call_end,
                     color: Colors.white,
                   ),
@@ -243,8 +244,8 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
                   onMute(isMuted);
                 },
                 child: Icon(
-                  Icons.mic_off,
-                  color: isMuted ? Colors.blue : Colors.white,
+                  isMuted ? Icons.mic_off : Icons.mic,
+                  color: Colors.black,
                 ),
               ),
             ],
@@ -255,33 +256,63 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
   }
 
   Future<void> setupVoiceSDKEngine() async {
+    print('🎤 [CUSTOMER SETUP] Requesting microphone permission...');
     // retrieve or request microphone permission
     await [Permission.microphone].request();
     //create an instance of the Agora engine
     try {
+      print('🎤 [CUSTOMER SETUP] Creating Agora engine...');
       agoraEngine = createAgoraRtcEngine();
-      await agoraEngine.initialize(RtcEngineContext(
-          appId:
-              global.getSystemFlagValue(global.systemFlagNameList.agoraAppId)));
+      
+      // ✅ FIX: Use appId from backend (widget) if available, otherwise fallback to system flag
+      final String effectiveAppId = (widget.appId != null && widget.appId!.isNotEmpty)
+          ? widget.appId!
+          : global.getSystemFlagValue(global.systemFlagNameList.agoraAppId);
+      
+      await agoraEngine.initialize(RtcEngineContext(appId: effectiveAppId));
+      print('✅ [CUSTOMER SETUP] Agora engine initialized');
+      print('✅ [CUSTOMER SETUP] Using App ID: ${effectiveAppId.substring(0, effectiveAppId.length > 6 ? 6 : effectiveAppId.length)}********');
+      
+      // Explicitly configure audio for voice communication
+      await agoraEngine.enableAudio();
+      await agoraEngine.setAudioProfile(
+        profile: AudioProfileType.audioProfileSpeechStandard,
+      );
     } catch (e) {
-      print('Exception in setupVoiceSDKEngine:- ${e.toString()}');
+      print('❌ [CUSTOMER SETUP] Exception in setupVoiceSDKEngine: ${e.toString()}');
     }
 
     // Register the event handler
     agoraEngine.registerEventHandler(
       RtcEngineEventHandler(
         onJoinChannelSuccess: (RtcConnection connection, int elapsed) async {
+          print('✅ [CUSTOMER JOIN SUCCESS] Customer joined channel!');
+          print('✅ [CUSTOMER JOIN SUCCESS] Local UID: ${connection.localUid}');
+          print('✅ [CUSTOMER JOIN SUCCESS] Channel: ${connection.channelId}');
+          print('✅ [CUSTOMER JOIN SUCCESS] Elapsed: ${elapsed}ms');
+          print('✅ [CUSTOMER JOIN SUCCESS] Now waiting for expert to join...');
           setState(() {
             isJoined = true;
             localUserId = connection.localUid;
             global.localUid = localUserId;
-            print('userid : - ${connection.localUid}');
           });
           await callController.getAgoraResourceId(
               widget.callChannel!, global.localUid!);
+          // Route audio after join to avoid ERR_NOT_READY
+          try {
+            await Future.delayed(const Duration(milliseconds: 200));
+            onVolume(isSpeaker);
+            onMute(isMuted);
+          } catch (e) {
+            print('⚠️ set speaker/mute post-join failed: $e');
+          }
         },
         onUserJoined:
             (RtcConnection connection, int remoteUId, int elapsed) async {
+          print('✅ [EXPERT JOINED] Expert joined the call!');
+          print('✅ [EXPERT JOINED] Expert UID: $remoteUId');
+          print('✅ [EXPERT JOINED] Expected expert ID: ${widget.astrologerId}');
+          print('✅ [EXPERT JOINED] Starting call timer now...');
           setState(() {
             isHostJoin = true;
             remoteID = remoteUId;
@@ -294,7 +325,6 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
               _callController.totalSeconds = _callController.totalSeconds + 1;
 
               _callController.update();
-              print('totalsecons ${_callController.totalSeconds}');
             });
           });
           // await callController.getAgoraResourceId2(
@@ -303,7 +333,14 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
 
           callController.isLeaveCall = false;
           callController.update();
-          print("RemoteId for call" + remoteID.toString());
+          print('✅ [AUDIO] Unmuting all remote audio streams...');
+          // Ensure we are receiving remote audio
+          try {
+            await agoraEngine.muteAllRemoteAudioStreams(false);
+            print('✅ [AUDIO] Remote audio streams unmuted successfully');
+          } catch (e) {
+            print('⚠️ [AUDIO] muteAllRemoteAudioStreams(false) failed: $e');
+          }
         },
         onUserOffline: (RtcConnection connection, int remoteUId,
             UserOfflineReasonType reason) async {
@@ -320,10 +357,18 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
               ));
         },
         onRtcStats: (connection, stats) {},
+        onLocalAudioStateChanged: (connection, state, reason) {
+          print('🎙️ [AUDIO] Local audio state: $state, reason: $reason');
+        },
+        onRemoteAudioStateChanged: (connection, remoteUid, state, reason, elapsed) {
+          print('👂 [AUDIO] Remote($remoteUid) audio state: $state, reason: $reason');
+        },
+        onError: (err, msg) {
+          print('❌ [AGORA ERROR] code: $err, message: $msg');
+        },
       ),
     );
-    onVolume(isSpeaker);
-    onMute(isMuted);
+    // Join last to ensure engine fully initialized
     join();
   }
 
@@ -432,11 +477,21 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
   }
 
   void onMute(bool mute) {
-    agoraEngine.muteLocalAudioStream(mute);
+    try {
+      agoraEngine.muteLocalAudioStream(mute);
+      print('🎛️ [AUDIO] Local mute set to: $mute');
+    } catch (e) {
+      print('❌ [AUDIO] muteLocalAudioStream error: $e');
+    }
   }
 
   void onVolume(bool isSpeaker) {
-    agoraEngine.setEnableSpeakerphone(isSpeaker);
+    try {
+      agoraEngine.setEnableSpeakerphone(isSpeaker);
+      print('🔈 [AUDIO] Speakerphone: $isSpeaker');
+    } catch (e) {
+      print('❌ [AUDIO] setEnableSpeakerphone error: $e');
+    }
   }
 
   Future<void> leave() async {
@@ -480,6 +535,17 @@ class _AcceptCallScreenState extends State<AcceptCallScreen> {
 
   @override
   void dispose() {
+    print('🔴 [DISPOSE] Cleaning up customer call resources');
+    
+    // ✅ FIX: Properly cleanup Agora to prevent ERR_JOIN_CHANNEL_REJECTED (-17)
+    try {
+      agoraEngine.leaveChannel();
+      agoraEngine.release(sync: true);
+      print('✅ [DISPOSE] Agora cleaned up successfully');
+    } catch (e) {
+      print('⚠️ [DISPOSE] Agora cleanup error: $e');
+    }
+    
     if (timer != null) {
       timer!.cancel();
       print('stop timer in despose');

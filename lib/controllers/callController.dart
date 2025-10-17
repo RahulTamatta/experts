@@ -204,6 +204,7 @@ class CallController extends GetxController
           channelName: callData['channelName'],
           token: callData['token'],
           duration: callData['duration'] ?? '999999',
+          appId: callData['appId'],
         ));
         
         print('✅ [NAVIGATION] Successfully navigated to calling screen');

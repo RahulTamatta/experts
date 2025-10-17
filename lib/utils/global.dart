@@ -65,8 +65,8 @@ Map<String, dynamic> appParameters = {
     "imageBaseurl": "https://clubtrusted.in/",
   },
   "DEV": {
-    "apiUrl": "http://192.168.29.223:8001/api",
-    "imageBaseurl": "http://192.168.29.223:8001/",
+    "apiUrl": "http://10.0.2.2:8001/api",
+    "imageBaseurl": "http://10.0.2.2:8001/",
   }
 };
 String agoraChannelName = ""; //valid 24hr

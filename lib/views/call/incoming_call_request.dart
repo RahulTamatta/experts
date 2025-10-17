@@ -24,8 +24,9 @@ class IncomingCallRequest extends StatelessWidget {
   final String channel;
   final String fcmToken;
   String duration;
+  final String? appId; // App ID from backend (must match token)
 
-  IncomingCallRequest({super.key, this.astrologerName, required this.fcmToken, required this.callId, this.astrologerProfile, required this.astrologerId, required this.token, required this.channel,required this.duration});
+  IncomingCallRequest({super.key, this.astrologerName, required this.fcmToken, required this.callId, this.astrologerProfile, required this.astrologerId, required this.token, required this.channel,required this.duration, this.appId});
   CallController callController = Get.find<CallController>();
 
   @override
@@ -164,6 +165,7 @@ class IncomingCallRequest extends StatelessWidget {
                                   callChannel: channel,
                                   callId: callId,
                                    duration: duration,
+                                   appId: appId,
                                 ));
                           },
                           child: Container(

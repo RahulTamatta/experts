@@ -22,6 +22,7 @@ class CallingScreen extends StatefulWidget {
   final String channelName;
   final String token;
   final String duration;
+  final String? appId; // App ID from backend (must match token)
 
   CallingScreen({
     super.key,
@@ -33,6 +34,7 @@ class CallingScreen extends StatefulWidget {
     required this.channelName,
     required this.token,
     required this.duration,
+    this.appId,
   });
 
   @override
@@ -78,10 +80,10 @@ class _CallingScreenState extends State<CallingScreen> with SingleTickerProvider
       // Check if call was accepted by expert
       final result = await callController.apiHelper.getCallStatus(widget.callId);
       
-      // ✅ FIX: Check recordList.callStatus, not top-level status (which is HTTP 200)
-      final callStatus = result != null && result['recordList'] != null 
-          ? result['recordList']['callStatus'] 
-          : null;
+      // ✅ FIX: Check result['status'] directly (getCallStatus returns {status: 'Accepted', data: {...}})
+      final callStatus = result != null ? result['status'] : null;
+      
+      print('🔍 [CALLING SCREEN] Polling result: $callStatus');
       
       if (callStatus == 'Accepted') {
         print('✅ [CALLING SCREEN] Expert accepted! Joining call...');
@@ -98,6 +100,7 @@ class _CallingScreenState extends State<CallingScreen> with SingleTickerProvider
           callId: widget.callId,
           duration: widget.duration,
           isfromnotification: false,
+          appId: widget.appId,
         ));
       } else if (callStatus == 'Rejected') {
         print('❌ [CALLING SCREEN] Expert rejected call');
