@@ -51,7 +51,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   log("_firebaseMessagingBackgroundHandler a background message: ${message.messageId}");
   // Initialize Firebase only if not already initialized
   try {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
   } catch (e) {
     // Firebase already initialized, continue
     log("Firebase already initialized in background handler: $e");
@@ -241,10 +242,11 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
-  
+
   // Initialize Firebase only if not already initialized
   try {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
     log("Firebase initialized successfully in main");
   } catch (e) {
     log("Firebase initialization error (likely already initialized): $e");
@@ -292,6 +294,7 @@ class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 }
+
 final bottomController = Get.put(BottomNavigationController());
 final liveController = Get.put(LiveController());
 final customerSupportController = Get.put(CustomerSupportController());
@@ -405,59 +408,64 @@ class _MyAppState extends State<MyApp> {
                 log('📞 [CUSTOMER] Astrologer: ${messageData['name']}');
                 log('📞 [CUSTOMER] Channel: ${messageData['channelName']}');
                 log('📞 [CUSTOMER] Token: ${messageData['token']?.substring(0, 30)}...');
-                
+
                 // Show CallKit incoming call dialog
                 await showIncomingCallDialog(
                   context: Get.context!,
-                  astrologerId: int.tryParse(messageData['id']?.toString() ?? '0') ?? 0,
+                  astrologerId:
+                      int.tryParse(messageData['id']?.toString() ?? '0') ?? 0,
                   astrologerName: messageData['name'] ?? 'Astrologer',
                   astrologerProfile: messageData['profile'] ?? '',
                   token: messageData['token'] ?? '',
                   channelName: messageData['channelName'] ?? '',
-                  callId: int.tryParse(messageData['callId']?.toString() ?? '0') ?? 0,
-                  callType: int.tryParse(messageData['call_type']?.toString() ?? '10') ?? 10,
-                  duration: messageData['call_duration']?.toString() ?? '999999',
+                  callId:
+                      int.tryParse(messageData['callId']?.toString() ?? '0') ??
+                          0,
+                  callType: int.tryParse(
+                          messageData['call_type']?.toString() ?? '10') ??
+                      10,
+                  duration:
+                      messageData['call_duration']?.toString() ?? '999999',
                   appId: messageData['appId'] ?? '',
                 );
               } else if (messageData['notificationType'] == 3) {
                 // ✅ WHATSAPP-LIKE: Auto-navigate to chat screen when accepted
                 log('🎉 [CUSTOMER] Chat request accepted - auto-navigating to chat');
-                
+
                 foregroundNotification(message, messageData['icon'] ?? "");
                 await player.setSource(AssetSource('ringtone.mp3'));
                 await player.resume();
-                
+
                 // Auto-accept and navigate instead of showing dialog
                 global.showOnlyLoaderDialog(Get.context!);
-                await chatController.acceptedChat(
-                  int.parse(messageData["chatId"].toString())
-                );
-                
+                await chatController
+                    .acceptedChat(int.parse(messageData["chatId"].toString()));
+
                 global.callOnFcmApiSendPushNotifications(
-                  fcmTokem: [messageData["fcmToken"]],
-                  title: 'Start simple chat timer'
-                );
+                    fcmTokem: [messageData["fcmToken"]],
+                    title: 'Start simple chat timer');
                 global.hideLoader();
-                
+
                 chatController.isInchat = true;
                 chatController.isEndChat = false;
                 TimerController timerController = Get.find<TimerController>();
                 timerController.startTimer();
                 chatController.update();
                 await player.stop();
-                
+
                 // Auto-navigate to chat screen
                 Get.to(() => AcceptChatScreen(
-                  flagId: 1,
-                  astrologerName: messageData["astrologerName"] ?? "Astrologer",
-                  profileImage: messageData["profile"]?.toString() ?? "",
-                  fireBasechatId: messageData["firebaseChatId"].toString(),
-                  astrologerId: messageData["astrologerId"],
-                  chatId: int.parse(messageData["chatId"].toString()),
-                  fcmToken: messageData["fcmToken"],
-                  duration: messageData['chat_duration'].toString(),
-                ));
-                
+                      flagId: 1,
+                      astrologerName:
+                          messageData["astrologerName"] ?? "Astrologer",
+                      profileImage: messageData["profile"]?.toString() ?? "",
+                      fireBasechatId: messageData["firebaseChatId"].toString(),
+                      astrologerId: messageData["astrologerId"],
+                      chatId: int.parse(messageData["chatId"].toString()),
+                      fcmToken: messageData["fcmToken"],
+                      duration: messageData['chat_duration'].toString(),
+                    ));
+
                 // Show bottom accept chat UI
                 chatController.showBottomAcceptChatRequest(
                   astrologerId: messageData["astrologerId"],
@@ -468,13 +476,12 @@ class _MyAppState extends State<MyApp> {
                   fcmToken: messageData["fcmToken"],
                   duration: messageData['chat_duration'],
                 );
-                
-                
+
                 await FirebaseMessaging.instance
                     .setForegroundNotificationPresentationOptions(
                         alert: true, badge: true, sound: true);
                 log("✅ [CUSTOMER] Auto-navigated to chat screen");
-                
+
                 // OLD CODE: Show dialog (now replaced with auto-navigation)
                 /*
                 showDialog(
